@@ -19,7 +19,11 @@ public class RequestTest {
     public static Object[][] dataProviderHttpMethods() {
     	return new Object[][] {
     		{ "GET" },
-    		{ "POST" }
+    		{ "HEAD" },
+    		{ "POST" },
+    		{ "PUT" },
+    		{ "DELETE" },
+    		{ "OPTIONS" }
     	};
     }
 
@@ -27,7 +31,7 @@ public class RequestTest {
     @UseDataProvider("dataProviderHttpMethods")
     public void itShouldGetTheMethodFromTheMessage(String method) {
         String message = "";
-        message += method + " / HTTP/1.1\r\n";
+        message += method + " /hello.html HTTP/1.1\r\n";
         message += "User-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.7l zlib/1.2.3\r\n";
         message += "Host: www.example.com\r\n";
         message += "Accept-Language: en, mi\r\n";
@@ -36,6 +40,32 @@ public class RequestTest {
 
         Request request = Try.of(() -> new HttpParser(in).request()).get();
         assertThat(request.getMethod(), equalTo(method));
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderUris() {
+    	return new Object[][] {
+    		{ "/" },
+            { "/hello.html" },
+            { "/foo/hello.html" },
+            { "/foo/bar/hello.html" },
+            { "/hello.html?foo=bar" }
+    	};
+    }
+
+    @Test
+    @UseDataProvider("dataProviderUris")
+    public void itShouldGetTheRequestTargetFromTheMessage(String uri) {
+        String message = "";
+        message += "GET " + uri + " HTTP/1.1\r\n";
+        message += "User-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.7l zlib/1.2.3\r\n";
+        message += "Host: www.example.com\r\n";
+        message += "Accept-Language: en, mi\r\n";
+
+        StringReader in = new StringReader(message);
+
+        Request request = Try.of(() -> new HttpParser(in).request()).get();
+        assertThat(request.getRequestTarget(), equalTo(uri));
     }
 
 }

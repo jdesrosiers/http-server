@@ -24,6 +24,8 @@ class HttpServer {
                         out.println("HTTP/1.1 200 OK");
                     } catch (ParseException pe) {
                         out.println("HTTP/1.1 500 Internal Server Error");
+                    } catch (TokenMgrError tme) {
+                        out.println("HTTP/1.1 500 Internal Server Error");
                     }
                 } finally {
                     socket.close();

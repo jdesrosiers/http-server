@@ -10,16 +10,75 @@ PARSER_BEGIN(HttpParser)
 
 PARSER_END(HttpParser)
 
-SKIP:  { " " }
-TOKEN: { <STRING_LITERAL> }
-
-Request request(): { String method; }
-{
-    method=method() "/" "HTTP/1.1" { return new Request(method); }
+TOKEN: {
+    < SP : " " >
+  | < #CR : "\r" >
+  | < #LF : "\n" >
+  | < CRLF : <CR> <LF> >
+  | < #ALPHA : ["A"-"Z"] | ["a"-"z"] >
+  | < #DIGIT : ["0"-"9"] >
+  | < #HEXDIG : <DIGIT> | "A" | "B" | "C" | "D" | "E" | "F" >
+  | < UNRESERVED : <ALPHA> | <DIGIT> | "-" | "." | "_" | "~" >
+  | < PCT_ENCODED : "%" <HEXDIG> <HEXDIG> >
+  | < SUB_DELIMS : "!" | "$" | "&" | "'" | "(" | ")" | "*" | "+" | "," | ";" | "=" >
 }
 
-String method(): { Token method; }
-{
-    method="GET" { return method.image; } |
-    method="POST" { return method.image; }
+Request request() : { String method, requestTarget; } {
+    method=method() <SP> requestTarget=requestTarget() <SP> "HTTP/1.1" <CRLF> {
+        return new Request(method, requestTarget);
+    }
+}
+
+String method() : { Token method; } {
+    method="GET" { return method.image; }
+  | method="HEAD" { return method.image; }
+  | method="POST" { return method.image; }
+  | method="PUT" { return method.image; }
+  | method="DELETE" { return method.image; }
+  | method="OPTIONS" { return method.image; }
+}
+
+String requestTarget() : { String target; } {
+    target=originForm() { return target; }
+}
+
+String originForm() : { StringBuilder builder = new StringBuilder(); String str; } {
+    str=absolutePath() { builder.append(str); }
+    [ "?" str=query() { builder.append("?" + str); } ]
+    { return builder.toString(); }
+}
+
+String absolutePath() : { StringBuilder builder = new StringBuilder(); String seg = ""; } {
+    "/" { builder.append("/"); }
+    [
+        seg=segmentNz() { builder.append(seg); }
+        (
+            "/" { builder.append("/"); }
+            seg=segment() { builder.append(seg); }
+        )*
+    ] { return builder.toString(); }
+}
+
+String query() : { StringBuilder builder = new StringBuilder(); Token ch; String str; } {
+    (
+        str=pchar() { builder.append(str); }
+      | ch="/" { builder.append(ch.image); }
+      | ch="?" { builder.append(ch.image); }
+    )* { return builder.toString(); }
+}
+
+String segmentNz() : { StringBuilder builder = new StringBuilder(); String str; } {
+    (str=pchar() { builder.append(str); })+ { return builder.toString(); }
+}
+
+String segment() : { StringBuilder builder = new StringBuilder(); String str; } {
+    (str=pchar() { builder.append(str); })* { return builder.toString(); }
+}
+
+String pchar() : { Token ch; } {
+    ch=<UNRESERVED> { return ch.image; }
+  | ch=<PCT_ENCODED> { return ch.image; }
+  | ch=<SUB_DELIMS> { return ch.image; }
+  | ch=":" { return ch.image; }
+  | ch="@" { return ch.image; }
 }
