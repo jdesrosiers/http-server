@@ -43,7 +43,7 @@ dependencies {
 }
 
 // Define the main class for the application
-mainClassName = 'HttpServer'
+mainClassName = 'org.httpserver.HttpServer'
 
 test {
     testLogging {

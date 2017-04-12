@@ -1,0 +1,25 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(HttpParser)
+
+    package org.httpserver;
+
+    public class HttpParser { }
+
+PARSER_END(HttpParser)
+
+SKIP:  { " " }
+TOKEN: { <STRING_LITERAL> }
+
+Request request(): { String method; }
+{
+    method=method() "/" "HTTP/1.1" { return new Request(method); }
+}
+
+String method(): { Token method; }
+{
+    method="GET" { return method.image; } |
+    method="POST" { return method.image; }
+}

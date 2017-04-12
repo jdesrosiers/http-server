@@ -1,14 +1,10 @@
-package com.httpserver;
+package org.httpserver;
 
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import javaslang.collection.Stream;
-import javaslang.control.Try;
 
 class HttpServer {
     public static void main(String[] args) throws IOException {
@@ -19,12 +15,16 @@ class HttpServer {
             while (true) {
                 Socket socket = listener.accept();
                 try {
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    InputStreamReader reader = new InputStreamReader(socket.getInputStream());
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-                    String request = server.captureMessage(in);
-                    System.out.println(request);
-                    out.println("HTTP/1.1 200 OK");
+                    try {
+                        Request request = new HttpParser(reader).request();
+                        System.out.println(request.toString());
+                        out.println("HTTP/1.1 200 OK");
+                    } catch (ParseException pe) {
+                        out.println("HTTP/1.1 500 Internal Server Error");
+                    }
                 } finally {
                     socket.close();
                 }
@@ -32,12 +32,5 @@ class HttpServer {
         } finally {
             listener.close();
         }
-    }
-
-    public String captureMessage(BufferedReader in) {
-        return Stream.continually(() -> Try.of(in::readLine).get())
-            .takeWhile((line) -> line.length() > 0)
-            .map((line) -> line + "\r\n")
-            .fold("", String::concat);
     }
 }
