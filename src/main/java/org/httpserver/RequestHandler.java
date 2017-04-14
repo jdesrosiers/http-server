@@ -1,6 +1,6 @@
 package org.httpserver;
 
-public abstract class RequestHandler {
+public class RequestHandler {
     public Response handle(Request request) {
         if (request.getMethod() == "GET") {
             return handleGET(request);
@@ -24,7 +24,7 @@ public abstract class RequestHandler {
     }
 
     protected Response handleHEAD(Request request) {
-        return Response.create(StatusCode.METHOD_NOT_ALLOWED);
+        return handleGET(request);
     }
 
     protected Response handlePOST(Request request) {

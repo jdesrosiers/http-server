@@ -4,6 +4,9 @@ import javaslang.collection.HashMap;
 import javaslang.collection.Map;
 import javaslang.control.Option;
 
+import java.io.PrintWriter;
+import java.io.OutputStream;
+
 public class Response {
     private int statusCode;
     private Map headers = HashMap.of();
@@ -59,18 +62,17 @@ public class Response {
         setHeader("Content-Length", Integer.toString(body.getBytes().length));
     }
 
-    public String toHttpMessage() {
-        StringBuilder message = new StringBuilder();
-        message.append(String.format("HTTP/1.1 %s %s\r\n", statusCode, StatusCode.getMessage(statusCode).get()));
+    public void writeHttpMessage(OutputStream os) {
+        PrintWriter out = new PrintWriter(os, true);
 
-        headers.forEach((header, value) -> message.append(String.format("%s: %s\r\n", header, value)));
-
-        message.append("\r\n");
+        out.println(String.format("HTTP/1.1 %s %s\r", statusCode, StatusCode.getMessage(statusCode).get()));
+        headers.forEach((header, value) -> out.println(String.format("%s: %s\r", header, value)));
+        out.println("\r");
 
         if (body.length() > 0) {
-            message.append(String.format("%s\r\n", body));
+            out.println(String.format("%s\r", body));
         }
 
-        return message.toString();
+        out.close();
     }
 }

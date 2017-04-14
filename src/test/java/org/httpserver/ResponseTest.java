@@ -14,6 +14,9 @@ import javaslang.collection.Map;
 import javaslang.Tuple;
 import javaslang.control.Option;
 
+import java.io.PrintWriter;
+import java.io.ByteArrayOutputStream;
+
 @RunWith(DataProviderRunner.class)
 public class ResponseTest {
 
@@ -97,6 +100,7 @@ public class ResponseTest {
 
     @Test
     public void itShouldGenerateAnHttpMessageRepresentationFor200OK() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Response response = Response.create();
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
         response.setBody("foo");
@@ -108,11 +112,14 @@ public class ResponseTest {
         expected.append("\r\n");
         expected.append("foo\r\n");
 
-        assertThat(response.toHttpMessage(), equalTo(expected.toString()));
+        response.writeHttpMessage(out);
+
+        assertThat(out.toString(), equalTo(expected.toString()));
     }
 
     @Test
     public void itShouldGenerateAnHttpMessageRepresentationFor404NotFound() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Response response = Response.create(StatusCode.NOT_FOUND);
 
         StringBuilder expected = new StringBuilder();
@@ -120,11 +127,14 @@ public class ResponseTest {
         expected.append("Content-Length: 0\r\n");
         expected.append("\r\n");
 
-        assertThat(response.toHttpMessage(), equalTo(expected.toString()));
+        response.writeHttpMessage(out);
+
+        assertThat(out.toString(), equalTo(expected.toString()));
     }
 
     @Test
     public void itShouldSetTheContentLengthHeaderToTheCorrectValue() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Response response = Response.create();
         response.setBody("foo");
 
@@ -134,7 +144,9 @@ public class ResponseTest {
         expected.append("\r\n");
         expected.append("foo\r\n");
 
-        assertThat(response.toHttpMessage(), equalTo(expected.toString()));
+        response.writeHttpMessage(out);
+
+        assertThat(out.toString(), equalTo(expected.toString()));
     }
 
 }

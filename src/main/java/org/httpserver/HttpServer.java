@@ -1,6 +1,7 @@
 package org.httpserver;
 
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -16,22 +17,21 @@ class HttpServer {
                 Socket socket = listener.accept();
                 try {
                     InputStreamReader reader = new InputStreamReader(socket.getInputStream());
-                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                    OutputStream os = socket.getOutputStream();
+                    PrintWriter out = new PrintWriter(os, true);
+                    Response response;
 
                     try {
                         Request request = new HttpParser(reader).request();
-                        System.out.println(request.toString());
-
-                        RequestHandler handler = new StubRequestHandler();
-                        Response response = handler.handle(request);
-
-                        System.out.println(response.toHttpMessage());
-                        out.println(response.toHttpMessage());
+                        RequestHandler handler = new FileSystemRequestHandler("./public");
+                        response = handler.handle(request);
                     } catch (ParseException pe) {
-                        out.println("HTTP/1.1 500 Internal Server Error");
+                        response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
                     } catch (TokenMgrError tme) {
-                        out.println("HTTP/1.1 500 Internal Server Error");
+                        response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
                     }
+
+                    response.writeHttpMessage(os);
                 } finally {
                     socket.close();
                 }
