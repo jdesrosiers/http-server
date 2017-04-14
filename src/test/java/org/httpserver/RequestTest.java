@@ -68,4 +68,18 @@ public class RequestTest {
         assertThat(request.getRequestTarget(), equalTo(uri));
     }
 
+    @Test
+    public void itShouldHaveAStringRepresentationThatMatchesTheOriginalRequest() {
+        String message = "";
+        message += "GET /hello.html HTTP/1.1\r\n";
+        message += "User-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.7l zlib/1.2.3\r\n";
+        message += "Host: www.example.com\r\n";
+        message += "Accept-Language: en, mi\r\n";
+
+        StringReader in = new StringReader(message);
+
+        Request request = Try.of(() -> new HttpParser(in).request()).get();
+        assertThat(request.toString(), equalTo("GET /hello.html HTTP/1.1\r\n"));
+    }
+
 }

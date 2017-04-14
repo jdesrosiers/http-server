@@ -21,7 +21,12 @@ class HttpServer {
                     try {
                         Request request = new HttpParser(reader).request();
                         System.out.println(request.toString());
-                        out.println("HTTP/1.1 200 OK");
+
+                        RequestHandler handler = new StubRequestHandler();
+                        Response response = handler.handle(request);
+
+                        System.out.println(response.toHttpMessage());
+                        out.println(response.toHttpMessage());
                     } catch (ParseException pe) {
                         out.println("HTTP/1.1 500 Internal Server Error");
                     } catch (TokenMgrError tme) {
