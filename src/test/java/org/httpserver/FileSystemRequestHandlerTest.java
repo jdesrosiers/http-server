@@ -18,15 +18,16 @@ public class FileSystemRequestHandlerTest {
 
     @Test
     public void itShouldAssembleThePathToTheResource() {
-        Path targetPath = Paths.get("./public", "/file1");
+        Path publicPath = Paths.get("public");
+        Path targetPath = publicPath.resolve("./file1").normalize();
 
-        assertThat(targetPath.toString(), equalTo("./public/file1"));
+        assertThat(targetPath.toString(), equalTo("public/file1"));
         assertThat(Files.exists(targetPath), equalTo(true));
     }
 
     @Test
     public void ifTheResourceExistsItShouldReturnItWith200OK() {
-        RequestHandler server = new FileSystemRequestHandler("./public/");
+        RequestHandler server = new FileSystemRequestHandler(Paths.get("public"));
         Request request = new Request("GET", "/file1");
 
         Response response = server.handle(request);
@@ -37,7 +38,7 @@ public class FileSystemRequestHandlerTest {
 
     @Test
     public void ifTheResourceDoesntExistsItShouldReturnItWith404NotFound() {
-        RequestHandler server = new FileSystemRequestHandler("./public/");
+        RequestHandler server = new FileSystemRequestHandler(Paths.get("public"));
         Request request = new Request("GET", "/doesnt-exist");
 
         Response response = server.handle(request);
@@ -48,14 +49,14 @@ public class FileSystemRequestHandlerTest {
 
     @Test
     public void ifTheResourceIsADirectoryItShouldReturnADirectoryListing() {
-        RequestHandler server = new FileSystemRequestHandler("./public/");
+        RequestHandler server = new FileSystemRequestHandler(Paths.get("public"));
         Request request = new Request("GET", "/");
 
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(response.getBody(), containsString("<a href=\"/file1\">file1</a>"));
-        assertThat(response.getBody(), containsString("<a href=\"/file2\">file2</a>"));
+        assertThat(response.getBody(), containsString("<a href=\"file1\">file1</a>"));
+        assertThat(response.getBody(), containsString("<a href=\"file2\">file2</a>"));
     }
 
 }

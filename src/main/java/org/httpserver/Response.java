@@ -64,7 +64,6 @@ public class Response {
 
     public void writeHttpMessage(OutputStream os) {
         PrintWriter out = new PrintWriter(os, true);
-
         out.println(String.format("HTTP/1.1 %s %s\r", statusCode, StatusCode.getMessage(statusCode).get()));
         headers.forEach((header, value) -> out.println(String.format("%s: %s\r", header, value)));
         out.println("\r");
@@ -72,7 +71,5 @@ public class Response {
         if (body.length() > 0) {
             out.println(String.format("%s\r", body));
         }
-
-        out.close();
     }
 }

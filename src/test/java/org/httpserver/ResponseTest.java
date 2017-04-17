@@ -100,7 +100,7 @@ public class ResponseTest {
 
     @Test
     public void itShouldGenerateAnHttpMessageRepresentationFor200OK() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         Response response = Response.create();
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
         response.setBody("foo");
@@ -112,14 +112,14 @@ public class ResponseTest {
         expected.append("\r\n");
         expected.append("foo\r\n");
 
-        response.writeHttpMessage(out);
+        response.writeHttpMessage(os);
 
-        assertThat(out.toString(), equalTo(expected.toString()));
+        assertThat(os.toString(), equalTo(expected.toString()));
     }
 
     @Test
     public void itShouldGenerateAnHttpMessageRepresentationFor404NotFound() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         Response response = Response.create(StatusCode.NOT_FOUND);
 
         StringBuilder expected = new StringBuilder();
@@ -127,14 +127,14 @@ public class ResponseTest {
         expected.append("Content-Length: 0\r\n");
         expected.append("\r\n");
 
-        response.writeHttpMessage(out);
+        response.writeHttpMessage(os);
 
-        assertThat(out.toString(), equalTo(expected.toString()));
+        assertThat(os.toString(), equalTo(expected.toString()));
     }
 
     @Test
     public void itShouldSetTheContentLengthHeaderToTheCorrectValue() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         Response response = Response.create();
         response.setBody("foo");
 
@@ -144,9 +144,9 @@ public class ResponseTest {
         expected.append("\r\n");
         expected.append("foo\r\n");
 
-        response.writeHttpMessage(out);
+        response.writeHttpMessage(os);
 
-        assertThat(out.toString(), equalTo(expected.toString()));
+        assertThat(os.toString(), equalTo(expected.toString()));
     }
 
 }

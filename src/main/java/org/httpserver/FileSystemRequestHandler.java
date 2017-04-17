@@ -5,18 +5,18 @@ import java.nio.file.Path;
 import java.nio.file.Files;
 import java.io.IOException;
 
-import java.util.stream.Stream;
+import javaslang.control.Try;
 
 public class FileSystemRequestHandler extends RequestHandler {
-    private String publicPath;
+    private Path publicPath;
 
-    public FileSystemRequestHandler(String publicPath) {
+    public FileSystemRequestHandler(Path publicPath) {
         this.publicPath = publicPath;
     }
 
     @Override
     protected Response handleGET(Request request) {
-        Path targetPath = Paths.get(publicPath, request.getRequestTarget());
+        Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
 
         if (Files.exists(targetPath)) {
             try {
@@ -25,38 +25,29 @@ public class FileSystemRequestHandler extends RequestHandler {
                 } else if (Files.isDirectory(targetPath)) {
                     return index(targetPath, request);
                 } else {
-                    return methodNotAllowed(request);
+                    return defaultResponse(StatusCode.METHOD_NOT_ALLOWED);
                 }
             } catch (IOException ioe) {
-                return internalServerError(request);
+                return defaultResponse(StatusCode.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return notFound(request);
+            return defaultResponse(StatusCode.NOT_FOUND);
         }
     }
 
-    private Response notFound(Request request) {
-        Response response = Response.create(StatusCode.NOT_FOUND);
+    private Response defaultResponse(int statusCode) {
+        Response response = Response.create(statusCode);
         response.setHeader("Content-Type", "text/html; charset=utf-8");
-        response.setBody("<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>");
+        response.setBody(defaultBody(response));
 
         return response;
     }
 
-    private Response methodNotAllowed(Request request) {
-        Response response = Response.create(StatusCode.METHOD_NOT_ALLOWED);
-        response.setHeader("Content-Type", "text/html; charset=utf-8");
-        response.setBody("<html><head><title>415 Method Not Allowed</title></head><body><h1>415 Method Not Allowed</h1></body></html>");
-
-        return response;
-    }
-
-    private Response internalServerError(Request request) {
-        Response response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-        response.setHeader("Content-Type", "text/html; charset=utf-8");
-        response.setBody("<html><head><title>500 Internal Server Error</title></head><body><h1>500 Internal Server Error</h1></body></html>");
-
-        return response;
+    private String defaultBody(Response response) {
+        int status = response.getStatusCode();
+        String message = String.format("%s %s", status, StatusCode.getMessage(status).get());
+        String template = "<html><head><title>%s</title></head><body><h1>%s</h1></body></html>";
+        return String.format(template, message, message);
     }
 
     private Response retrieve(Path targetPath, Request request) throws IOException {
@@ -77,12 +68,9 @@ public class FileSystemRequestHandler extends RequestHandler {
         builder.append("    <h1>Index - " + request.getRequestTarget() + "</h1>");
         builder.append("    <ul>");
 
-        Stream<Path> paths = Files.walk(targetPath);
-        paths.forEach(filePath -> {
-            if (Files.isRegularFile(filePath)) {
-                builder.append("      <li><a href=\"" + filePath.toString().substring(Paths.get(publicPath).toString().length()) + "\">" + targetPath.relativize(filePath) + "</a></li>");
-            }
-        });
+        Files.walk(targetPath)
+            .filter(Files::isRegularFile)
+            .forEach((filePath) -> builder.append(indexItem(filePath, targetPath)));
 
         builder.append("    </ul>");
         builder.append("  </body>");
@@ -93,5 +81,9 @@ public class FileSystemRequestHandler extends RequestHandler {
         response.setBody(builder.toString());
 
         return response;
+    }
+
+    private String indexItem(Path filePath, Path targetPath) {
+        return String.format("<li><a href=\"%s\">%s</a></li>", publicPath.relativize(filePath), targetPath.relativize(filePath));
     }
 }

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Paths;
 
 class HttpServer {
     public static void main(String[] args) throws IOException {
@@ -23,7 +24,7 @@ class HttpServer {
 
                     try {
                         Request request = new HttpParser(reader).request();
-                        RequestHandler handler = new FileSystemRequestHandler("./public");
+                        RequestHandler handler = new FileSystemRequestHandler(Paths.get("public"));
                         response = handler.handle(request);
                     } catch (ParseException pe) {
                         response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
