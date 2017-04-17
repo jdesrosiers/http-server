@@ -52,13 +52,15 @@ public class FileSystemRequestHandler extends RequestHandler {
 
     private Response retrieve(Path targetPath, Request request) throws IOException {
         Response response = Response.create();
-        String body = new String(Files.readAllBytes(targetPath));
-        response.setBody(body);
+        response.setBody(Files.newInputStream(targetPath));
 
         return response;
     }
 
     private Response index(Path targetPath, Request request) throws IOException {
+        Response response = Response.create();
+        response.setHeader("Content-Type", "text/html; charset=utf-8");
+
         StringBuilder builder = new StringBuilder();
         builder.append("<html>");
         builder.append("  <head>");
@@ -75,9 +77,6 @@ public class FileSystemRequestHandler extends RequestHandler {
         builder.append("    </ul>");
         builder.append("  </body>");
         builder.append("</html>");
-
-        Response response = Response.create();
-        response.setHeader("Content-Type", "text/html; charset=utf-8");
         response.setBody(builder.toString());
 
         return response;

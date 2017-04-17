@@ -5,12 +5,21 @@ import javaslang.collection.Map;
 import javaslang.control.Option;
 
 import java.io.PrintWriter;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.IOUtils;
+
+import javaslang.control.Try;
 
 public class Response {
     private int statusCode;
     private Map headers = HashMap.of();
-    private String body;
+    private InputStream body;
 
     public static Response create() {
         return Response.create(200, HashMap.of(), "");
@@ -46,7 +55,11 @@ public class Response {
     }
 
     public String getBody() {
-        return body;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        return Try.of(() -> IOUtils.copy(body, out))
+            .map(_byteCount -> out.toString())
+            .getOrElse("");
     }
 
     public void setStatusCode(int statusCode) {
@@ -58,18 +71,24 @@ public class Response {
     }
 
     public void setBody(String body) {
-        this.body = body;
-        setHeader("Content-Length", Integer.toString(body.getBytes().length));
+        setBody(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public void writeHttpMessage(OutputStream os) {
+    public void setBody(InputStream body) {
+        this.body = body;
+        int length = Try.of(() -> body.available()).getOrElse(0);
+        setHeader("Content-Length", Integer.toString(length));
+    }
+
+    public void writeHttpMessage(OutputStream os) throws IOException {
         PrintWriter out = new PrintWriter(os, true);
         out.println(String.format("HTTP/1.1 %s %s\r", statusCode, StatusCode.getMessage(statusCode).get()));
         headers.forEach((header, value) -> out.println(String.format("%s: %s\r", header, value)));
         out.println("\r");
 
-        if (body.length() > 0) {
-            out.println(String.format("%s\r", body));
+        if (body.available() > 0) {
+            IOUtils.copy(body, out);
+            out.println("\r");
         }
     }
 }
