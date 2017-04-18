@@ -12,8 +12,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.IOUtils;
-
 import javaslang.control.Try;
 
 public class Response {
@@ -57,9 +55,10 @@ public class Response {
     public String getBody() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        return Try.of(() -> IOUtils.copy(body, out))
-            .map(_byteCount -> out.toString())
-            .getOrElse("");
+        return Try.of(() -> {
+            copyStreams(body, out);
+            return out.toString();
+        }).getOrElse("");
     }
 
     public void setStatusCode(int statusCode) {
@@ -91,8 +90,17 @@ public class Response {
         out.println("\r");
 
         if (body.available() > 0) {
-            IOUtils.copy(body, os);
+            copyStreams(body, os);
             out.println("\r");
+        }
+    }
+
+    private void copyStreams(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[4096];
+        int size = in.read(buffer);
+        while (size != -1) {
+            out.write(buffer, 0, size);
+            size = in.read(buffer);
         }
     }
 }
