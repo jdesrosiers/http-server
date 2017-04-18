@@ -74,6 +74,10 @@ public class Response {
         setBody(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
     }
 
+    public void removeBody() {
+        this.body = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
+    }
+
     public void setBody(InputStream body) {
         this.body = body;
         int length = Try.of(() -> body.available()).getOrElse(0);
@@ -87,7 +91,7 @@ public class Response {
         out.println("\r");
 
         if (body.available() > 0) {
-            IOUtils.copy(body, out);
+            IOUtils.copy(body, os);
             out.println("\r");
         }
     }
