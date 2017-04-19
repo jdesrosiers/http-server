@@ -65,13 +65,17 @@ public class Application {
                     try {
                         Request request = new HttpParser(reader).request();
                         response = getServer().handle(request);
+                        response.writeHttpMessage(os);
+                    } catch (IOException pe) {
+                        response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+                        response.writeHttpMessage(os);
                     } catch (ParseException pe) {
-                        response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+                        response = Response.create(StatusCode.BAD_REQUEST);
+                        response.writeHttpMessage(os);
                     } catch (TokenMgrError tme) {
-                        response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+                        response = Response.create(StatusCode.BAD_REQUEST);
+                        response.writeHttpMessage(os);
                     }
-
-                    response.writeHttpMessage(os);
                 } finally {
                     socket.close();
                 }
