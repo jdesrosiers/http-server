@@ -16,6 +16,7 @@ import javaslang.control.Option;
 
 import java.io.PrintWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 @RunWith(DataProviderRunner.class)
 public class ResponseTest {
@@ -99,7 +100,7 @@ public class ResponseTest {
     }
 
     @Test
-    public void itShouldGenerateAnHttpMessageRepresentationFor200OK() {
+    public void itShouldGenerateAnHttpMessageRepresentationFor200OK() throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Response response = Response.create();
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -118,7 +119,7 @@ public class ResponseTest {
     }
 
     @Test
-    public void itShouldGenerateAnHttpMessageRepresentationFor404NotFound() {
+    public void itShouldGenerateAnHttpMessageRepresentationFor404NotFound() throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Response response = Response.create(StatusCode.NOT_FOUND);
 
@@ -133,7 +134,7 @@ public class ResponseTest {
     }
 
     @Test
-    public void itShouldSetTheContentLengthHeaderToTheCorrectValue() {
+    public void itShouldSetTheContentLengthHeaderToTheCorrectValue() throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Response response = Response.create();
         response.setBody("foo");
