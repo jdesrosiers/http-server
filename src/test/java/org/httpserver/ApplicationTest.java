@@ -144,6 +144,28 @@ public class ApplicationTest {
     }
 
     @Test
+    public void itShouldHandleASimplePATCH() {
+        Application app = new Application();
+
+        app.patch("/foo", (request) -> {
+            Response response = Response.create(StatusCode.NO_CONTENT);
+            response.setHeader("ETag", "foo");
+
+            return response;
+        });
+
+        Server server = app.getServer();
+
+        Request request = new Request("PATCH", "/foo", HashMap.empty(), "");
+        Response response = server.handle(request);
+
+        assertThat(response.getStatusCode(), equalTo(StatusCode.NO_CONTENT));
+        assertThat(response.getHeader("ETag"), equalTo(Option.of("foo")));
+        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("0")));
+        assertThat(response.getBody(), equalTo(""));
+    }
+
+    @Test
     public void itShould404WhenANonexistentResourceIsRequested() {
         Application app = new Application();
 

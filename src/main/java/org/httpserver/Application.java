@@ -42,6 +42,10 @@ public class Application {
         return match("OPTIONS", uriTemplate, controller);
     }
 
+    public Route patch(String uriTemplate, Function1<Request, Response> controller) {
+        return match("PATCH", uriTemplate, controller);
+    }
+
     public Server getServer() {
         return new Server(routes.toList());
     }

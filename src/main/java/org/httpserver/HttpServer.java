@@ -61,6 +61,21 @@ class HttpServer {
             return response;
         });
 
+        app.get("/file2", (request) -> {
+            Response response;
+            Path publicPath = Paths.get("public");
+            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
+
+            try {
+                response = Response.create();
+                response.setBody(Files.newInputStream(targetPath));
+            } catch (IOException ioe) {
+                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+            }
+
+            return response;
+        });
+
         app.get("/image.jpeg", (request) -> {
             Response response;
             Path publicPath = Paths.get("public");
@@ -105,6 +120,45 @@ class HttpServer {
             } catch (IOException ioe) {
                 response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
             }
+
+            return response;
+        });
+
+        app.get("/partial_content.txt", (request) -> {
+            Response response;
+            Path publicPath = Paths.get("public");
+            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
+
+            try {
+                response = Response.create();
+                response.setHeader("Content-Type", "text/plain");
+                response.setBody(Files.newInputStream(targetPath));
+            } catch (IOException ioe) {
+                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+            }
+
+            return response;
+        });
+
+        app.get("/patch-content.txt", (request) -> {
+            Response response;
+            Path publicPath = Paths.get("public");
+            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
+
+            try {
+                response = Response.create();
+                response.setHeader("Content-Type", "text/plain");
+                response.setBody(Files.newInputStream(targetPath));
+            } catch (IOException ioe) {
+                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+            }
+
+            return response;
+        });
+
+        app.patch("/patch-content.txt", (request) -> {
+            Response response = Response.create(StatusCode.NO_CONTENT);
+            response.setHeader("Content-Type", "text/plain");
 
             return response;
         });
@@ -173,6 +227,12 @@ class HttpServer {
 
         app.get("/method_options2", (request) -> {
             return Response.create();
+        });
+
+        app.get("/logs", (request) -> {
+            Response response = Response.create(StatusCode.UNAUTHORIZED);
+            response.setHeader("WWW-Authenticate", "Basic realm-\"httpserver-logs\"");
+            return response;
         });
 
         app.run(5000);
