@@ -26,13 +26,17 @@ class HttpServer {
                         Request request = new HttpParser(reader).request();
                         RequestHandler handler = new FileSystemRequestHandler(Paths.get("public"));
                         response = handler.handle(request);
+                        response.writeHttpMessage(os);
+                    } catch (IOException ioe) {
+                        response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+                        response.writeHttpMessage(os);
                     } catch (ParseException pe) {
-                        response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+                        response = Response.create(StatusCode.BAD_REQUEST);
+                        response.writeHttpMessage(os);
                     } catch (TokenMgrError tme) {
-                        response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+                        response = Response.create(StatusCode.BAD_REQUEST);
+                        response.writeHttpMessage(os);
                     }
-
-                    response.writeHttpMessage(os);
                 } finally {
                     socket.close();
                 }

@@ -81,7 +81,7 @@ public class Response {
 
     public void writeHttpMessage(OutputStream os) throws IOException {
         PrintWriter out = new PrintWriter(os, true);
-        out.println(String.format("HTTP/1.1 %s %s\r", statusCode, StatusCode.getMessage(statusCode).get()));
+        out.println(String.format("HTTP/1.1 %s %s\r", statusCode, StatusCode.getMessage(statusCode).getOrElse("")));
         headers.forEach((header, value) -> out.println(String.format("%s: %s\r", header, value)));
         out.println("\r");
 
