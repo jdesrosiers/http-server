@@ -23,6 +23,10 @@ public class Request {
         return requestTarget;
     }
 
+    public String getBody() {
+        return body;
+    }
+
     @Override
     public String toString() {
         return String.format("%s %s HTTP/1.1\r\n", method, requestTarget);

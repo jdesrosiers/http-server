@@ -9,153 +9,18 @@ class HttpServer {
     public static void main(String[] args) throws IOException {
         Application app = new Application();
 
-        app.get("/", (request) -> {
-            Response response;
-            Path publicPath = Paths.get("public");
-            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
+        FileSystemController fileSystemController = new FileSystemController(Paths.get("public"));
 
-            try {
-                StringBuilder builder = new StringBuilder();
-                builder.append("<html>");
-                builder.append("  <head>");
-                builder.append("    <title>Index - " + request.getRequestTarget() + "</title>");
-                builder.append("  </head>");
-                builder.append("  <body>");
-                builder.append("    <h1>Index - " + request.getRequestTarget() + "</h1>");
-                builder.append("    <ul>");
+        app.get("/", fileSystemController::index);
+        app.get("/file1", fileSystemController::get);
+        app.get("/file2", fileSystemController::get);
+        app.get("/image.jpeg", fileSystemController::get);
+        app.get("/image.png", fileSystemController::get);
+        app.get("/image.gif", fileSystemController::get);
+        app.get("/partial_content.txt", fileSystemController::get);
+        app.get("/text-file.txt", fileSystemController::get);
 
-                Files.walk(targetPath)
-                    .filter(Files::isRegularFile)
-                    .forEach((filePath) -> {
-                        String item = String.format("<li><a href=\"/%s\">%s</a></li>", publicPath.relativize(filePath), targetPath.relativize(filePath));
-                        builder.append(item);
-                    });
-
-                builder.append("    </ul>");
-                builder.append("  </body>");
-                builder.append("</html>");
-
-                response = Response.create();
-                response.setHeader("Content-Type", "text/html; charset=utf-8");
-
-                response.setBody(builder.toString());
-            } catch (IOException ioe) {
-                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-            }
-
-            return response;
-        });
-
-        app.get("/file1", (request) -> {
-            Response response;
-            Path publicPath = Paths.get("public");
-            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
-
-            try {
-                response = Response.create();
-                response.setBody(Files.newInputStream(targetPath));
-            } catch (IOException ioe) {
-                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-            }
-
-            return response;
-        });
-
-        app.get("/file2", (request) -> {
-            Response response;
-            Path publicPath = Paths.get("public");
-            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
-
-            try {
-                response = Response.create();
-                response.setBody(Files.newInputStream(targetPath));
-            } catch (IOException ioe) {
-                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-            }
-
-            return response;
-        });
-
-        app.get("/image.jpeg", (request) -> {
-            Response response;
-            Path publicPath = Paths.get("public");
-            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
-
-            try {
-                response = Response.create();
-                response.setHeader("Content-Type", "image/jpeg");
-                response.setBody(Files.newInputStream(targetPath));
-            } catch (IOException ioe) {
-                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-            }
-
-            return response;
-        });
-
-        app.get("/image.png", (request) -> {
-            Response response;
-            Path publicPath = Paths.get("public");
-            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
-
-            try {
-                response = Response.create();
-                response.setHeader("Content-Type", "image/png");
-                response.setBody(Files.newInputStream(targetPath));
-            } catch (IOException ioe) {
-                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-            }
-
-            return response;
-        });
-
-        app.get("/image.gif", (request) -> {
-            Response response;
-            Path publicPath = Paths.get("public");
-            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
-
-            try {
-                response = Response.create();
-                response.setHeader("Content-Type", "image/gif");
-                response.setBody(Files.newInputStream(targetPath));
-            } catch (IOException ioe) {
-                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-            }
-
-            return response;
-        });
-
-        app.get("/partial_content.txt", (request) -> {
-            Response response;
-            Path publicPath = Paths.get("public");
-            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
-
-            try {
-                response = Response.create();
-                response.setHeader("Content-Type", "text/plain");
-                response.setBody(Files.newInputStream(targetPath));
-            } catch (IOException ioe) {
-                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-            }
-
-            return response;
-        });
-
-        app.get("/patch-content.txt", (request) -> {
-            Response response;
-            Path publicPath = Paths.get("public");
-            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
-
-            try {
-                response = Response.create();
-                response.setHeader("Content-Type", "text/plain");
-                response.setBody(Files.newInputStream(targetPath));
-            } catch (IOException ioe) {
-                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-            }
-
-            return response;
-        });
-
+        app.get("/patch-content.txt", fileSystemController::get);
         app.patch("/patch-content.txt", (request) -> {
             Response response = Response.create(StatusCode.NO_CONTENT);
             response.setHeader("Content-Type", "text/plain");
@@ -163,37 +28,10 @@ class HttpServer {
             return response;
         });
 
-        app.get("/text-file.txt", (request) -> {
-            Response response;
-            Path publicPath = Paths.get("public");
-            Path targetPath = publicPath.resolve("." + request.getRequestTarget()).normalize();
-
-            try {
-                response = Response.create();
-                response.setHeader("Content-Type", "text/plain");
-                response.setBody(Files.newInputStream(targetPath));
-            } catch (IOException ioe) {
-                response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-            }
-
-            return response;
-        });
-
-        app.get("/form", (request) -> {
-            return Response.create();
-        });
-
-        app.delete("/form", (request) -> {
-            return Response.create();
-        });
-
-        app.post("/form", (request) -> {
-            return Response.create();
-        });
-
-        app.put("/form", (request) -> {
-            return Response.create();
-        });
+        app.get("/form", fileSystemController::get);
+        app.delete("/form", fileSystemController::delete);
+        app.post("/form", fileSystemController::write);
+        app.put("/form", fileSystemController::write);
 
         app.get("/redirect", (request) -> {
             Response response = Response.create(StatusCode.FOUND);
@@ -201,18 +39,13 @@ class HttpServer {
             return response;
         });
 
+        app.get("/method_options", fileSystemController::get);
+        app.put("/method_options", fileSystemController::write);
+
         app.options("/method_options", (request) -> {
             Response response = Response.create();
             response.setHeader("Allow", "GET,HEAD,POST,OPTIONS,PUT");
             return response;
-        });
-
-        app.get("/method_options", (request) -> {
-            return Response.create();
-        });
-
-        app.put("/method_options", (request) -> {
-            return Response.create();
         });
 
         app.post("/method_options", (request) -> {
@@ -225,9 +58,7 @@ class HttpServer {
             return response;
         });
 
-        app.get("/method_options2", (request) -> {
-            return Response.create();
-        });
+        app.get("/method_options2", fileSystemController::get);
 
         app.get("/logs", (request) -> {
             Response response = Response.create(StatusCode.UNAUTHORIZED);

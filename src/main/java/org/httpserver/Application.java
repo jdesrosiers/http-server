@@ -1,6 +1,7 @@
 package org.httpserver;
 
 import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -65,16 +66,16 @@ public class Application {
                     try {
                         Request request = new HttpParser(reader).request();
                         response = getServer().handle(request);
-                        response.writeHttpMessage(os);
+                        writeHttpMessage(response, os);
                     } catch (IOException pe) {
                         response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
-                        response.writeHttpMessage(os);
+                        writeHttpMessage(response, os);
                     } catch (ParseException pe) {
                         response = Response.create(StatusCode.BAD_REQUEST);
-                        response.writeHttpMessage(os);
+                        writeHttpMessage(response, os);
                     } catch (TokenMgrError tme) {
                         response = Response.create(StatusCode.BAD_REQUEST);
-                        response.writeHttpMessage(os);
+                        writeHttpMessage(response, os);
                     }
                 } finally {
                     socket.close();
@@ -82,6 +83,24 @@ public class Application {
             }
         } finally {
             listener.close();
+        }
+    }
+
+    private void writeHttpMessage(Response response, OutputStream os) throws IOException {
+        PrintWriter out = new PrintWriter(os, true);
+
+        int statusCode = response.getStatusCode();
+        String statusMessage = StatusCode.getMessage(statusCode).getOrElse("");
+        out.println(String.format("HTTP/1.1 %s %s\r", statusCode, statusMessage));
+
+        response.getHeaders()
+            .forEach((header, value) -> out.println(String.format("%s: %s\r", header, value)));
+        out.println("\r");
+
+        InputStream body = response.getBody();
+        if (body.available() > 0) {
+            FileSystem.copyStreams(body, os);
+            out.println("\r");
         }
     }
 }

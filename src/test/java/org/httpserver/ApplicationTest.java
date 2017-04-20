@@ -33,7 +33,7 @@ public class ApplicationTest {
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
-        assertThat(response.getBody(), equalTo("foo"));
+        assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class ApplicationTest {
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
-        assertThat(response.getBody(), equalTo(""));
+        assertThat(response.getBodyAsString(), equalTo(""));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ApplicationTest {
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
-        assertThat(response.getBody(), equalTo("foo"));
+        assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class ApplicationTest {
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
-        assertThat(response.getBody(), equalTo("foo"));
+        assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ApplicationTest {
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
-        assertThat(response.getBody(), equalTo("foo"));
+        assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
     @Test
@@ -140,7 +140,7 @@ public class ApplicationTest {
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Allow"), equalTo(Option.of("GET,POST")));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
-        assertThat(response.getBody(), equalTo("foo"));
+        assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
     @Test
@@ -162,7 +162,7 @@ public class ApplicationTest {
         assertThat(response.getStatusCode(), equalTo(StatusCode.NO_CONTENT));
         assertThat(response.getHeader("ETag"), equalTo(Option.of("foo")));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("0")));
-        assertThat(response.getBody(), equalTo(""));
+        assertThat(response.getBodyAsString(), equalTo(""));
     }
 
     @Test
@@ -175,7 +175,7 @@ public class ApplicationTest {
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
-        assertThat(response.getBody(), containsString("404 Not Found"));
+        assertThat(response.getBodyAsString(), containsString("404 Not Found"));
     }
 
     @Test
@@ -189,7 +189,7 @@ public class ApplicationTest {
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
         assertThat(Integer.parseInt(response.getHeader("Content-Length").get()), greaterThan(0));
-        assertThat(response.getBody(), equalTo(""));
+        assertThat(response.getBodyAsString(), equalTo(""));
     }
 
     @Test
@@ -210,7 +210,7 @@ public class ApplicationTest {
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));
         assertThat(response.getHeader("Allow"), equalTo(Option.of("POST")));
-        assertThat(response.getBody(), containsString("405 Method Not Allowed"));
+        assertThat(response.getBodyAsString(), containsString("405 Method Not Allowed"));
     }
 
     @Test
@@ -235,7 +235,7 @@ public class ApplicationTest {
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));
         assertThat(response.getHeader("Allow"), equalTo(Option.of("GET,POST")));
-        assertThat(response.getBody(), containsString("405 Method Not Allowed"));
+        assertThat(response.getBodyAsString(), containsString("405 Method Not Allowed"));
     }
 
 }
