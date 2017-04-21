@@ -32,7 +32,7 @@ public class ResponseTest {
     public void itShouldDefaultToNoBody() {
         Response response = Response.create();
 
-        assertThat(response.getBody(), equalTo(""));
+        assertThat(response.getBodyAsString(), equalTo(""));
     }
 
     @Test
@@ -57,7 +57,7 @@ public class ResponseTest {
         String body = "foo";
         Response response = Response.create(StatusCode.NOT_FOUND, headers, body);
 
-        assertThat(response.getBody(), equalTo(body));
+        assertThat(response.getBodyAsString(), equalTo(body));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class ResponseTest {
         Response response = Response.create();
         response.setBody("foo");
 
-        assertThat(response.getBody(), equalTo("foo"));
+        assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
     @Test
@@ -97,57 +97,6 @@ public class ResponseTest {
         response.setBody("foo");
 
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
-    }
-
-    @Test
-    public void itShouldGenerateAnHttpMessageRepresentationFor200OK() throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        Response response = Response.create();
-        response.setHeader("Content-Type", "text/plain; charset=utf-8");
-        response.setBody("foo");
-
-        StringBuilder expected = new StringBuilder();
-        expected.append("HTTP/1.1 200 OK\r\n");
-        expected.append("Content-Type: text/plain; charset=utf-8\r\n");
-        expected.append("Content-Length: 3\r\n");
-        expected.append("\r\n");
-        expected.append("foo\r\n");
-
-        response.writeHttpMessage(os);
-
-        assertThat(os.toString(), equalTo(expected.toString()));
-    }
-
-    @Test
-    public void itShouldGenerateAnHttpMessageRepresentationFor404NotFound() throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        Response response = Response.create(StatusCode.NOT_FOUND);
-
-        StringBuilder expected = new StringBuilder();
-        expected.append("HTTP/1.1 404 Not Found\r\n");
-        expected.append("Content-Length: 0\r\n");
-        expected.append("\r\n");
-
-        response.writeHttpMessage(os);
-
-        assertThat(os.toString(), equalTo(expected.toString()));
-    }
-
-    @Test
-    public void itShouldSetTheContentLengthHeaderToTheCorrectValue() throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        Response response = Response.create();
-        response.setBody("foo");
-
-        StringBuilder expected = new StringBuilder();
-        expected.append("HTTP/1.1 200 OK\r\n");
-        expected.append("Content-Length: 3\r\n");
-        expected.append("\r\n");
-        expected.append("foo\r\n");
-
-        response.writeHttpMessage(os);
-
-        assertThat(os.toString(), equalTo(expected.toString()));
     }
 
 }

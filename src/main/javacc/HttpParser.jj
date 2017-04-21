@@ -6,6 +6,8 @@ PARSER_BEGIN(HttpParser)
 
     package org.httpserver;
 
+    import javaslang.collection.HashMap;
+
     public class HttpParser { }
 
 PARSER_END(HttpParser)
@@ -25,7 +27,7 @@ TOKEN: {
 
 Request request() : { String method, requestTarget; } {
     method=method() <SP> requestTarget=requestTarget() <SP> "HTTP/1.1" <CRLF> {
-        return new Request(method, requestTarget);
+        return new Request(method, requestTarget, HashMap.empty(), "");
     }
 }
 

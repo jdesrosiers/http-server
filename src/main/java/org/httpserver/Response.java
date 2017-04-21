@@ -52,13 +52,17 @@ public class Response {
         return headers.get(header);
     }
 
-    public String getBody() {
+    public String getBodyAsString() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         return Try.of(() -> {
-            copyStreams(body, out);
+            FileSystem.copyStreams(body, out);
             return out.toString();
         }).getOrElse("");
+    }
+
+    public InputStream getBody() {
+        return body;
     }
 
     public void setStatusCode(int statusCode) {
@@ -73,30 +77,13 @@ public class Response {
         setBody(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
     }
 
+    public void removeBody() {
+        this.body = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
+    }
+
     public void setBody(InputStream body) {
         this.body = body;
         int length = Try.of(() -> body.available()).getOrElse(0);
         setHeader("Content-Length", Integer.toString(length));
-    }
-
-    public void writeHttpMessage(OutputStream os) throws IOException {
-        PrintWriter out = new PrintWriter(os, true);
-        out.println(String.format("HTTP/1.1 %s %s\r", statusCode, StatusCode.getMessage(statusCode).getOrElse("")));
-        headers.forEach((header, value) -> out.println(String.format("%s: %s\r", header, value)));
-        out.println("\r");
-
-        if (body.available() > 0) {
-            copyStreams(body, os);
-            out.println("\r");
-        }
-    }
-
-    private void copyStreams(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[4096];
-        int size = in.read(buffer);
-        while (size != -1) {
-            out.write(buffer, 0, size);
-            size = in.read(buffer);
-        }
     }
 }
