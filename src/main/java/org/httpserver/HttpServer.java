@@ -28,10 +28,12 @@ class HttpServer {
             return response;
         });
 
-        app.get("/form", fileSystemController::get);
-        app.delete("/form", fileSystemController::delete);
-        app.post("/form", fileSystemController::write);
-        app.put("/form", fileSystemController::write);
+        app.post("/form", (request) -> fileSystemController.write(request, "/form/feline"));
+        app.get("/form/feline", fileSystemController::get);
+        app.put("/form/feline", fileSystemController::write);
+        app.delete("/form/feline", fileSystemController::delete);
+
+        app.post("/noop-form", (request) -> Response.create());
 
         app.get("/redirect", (request) -> {
             Response response = Response.create(StatusCode.FOUND);

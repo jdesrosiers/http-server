@@ -32,6 +32,15 @@ public class FileSystemControllerTest {
     }
 
     @Test
+    public void itShould404WhenGettingANonexistentFileFromTheFileSystem() {
+        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        Request request = new Request("GET", "/foobar", HashMap.empty(), "");
+        Response response = controller.get(request);
+
+        assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
+    }
+
+    @Test
     public void itShouldGetADirectoryListingFromTheFileSystem() {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
         Request request = new Request("GET", "/", HashMap.empty(), "");

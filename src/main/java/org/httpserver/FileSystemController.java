@@ -2,6 +2,7 @@ package org.httpserver;
 
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
@@ -18,13 +19,17 @@ public class FileSystemController {
         Path targetPath = rootPath.resolve("." + request.getRequestTarget()).normalize();
 
         try {
-            Response response = Response.create();
-            String extension = FileSystem.getExtension(request.getRequestTarget());
-            String contentType = MediaType.fromExtension(extension).getOrElse("application/octet-stream");
-            response.setHeader("Content-Type", contentType);
-            response.setBody(Files.newInputStream(targetPath));
+            if (Files.exists(targetPath)) {
+                Response response = Response.create();
+                String extension = FileSystem.getExtension(request.getRequestTarget());
+                String contentType = MediaType.fromExtension(extension).getOrElse("application/octet-stream");
+                response.setHeader("Content-Type", contentType);
+                response.setBody(Files.newInputStream(targetPath));
 
-            return response;
+                return response;
+            } else {
+                return Response.create(StatusCode.NOT_FOUND);
+            }
         } catch (IOException ioe) {
             return Response.create(StatusCode.INTERNAL_SERVER_ERROR);
         }
@@ -78,14 +83,27 @@ public class FileSystemController {
     }
 
     public Response write(Request request) {
-        Path targetPath = rootPath.resolve("." + request.getRequestTarget()).normalize();
+        ByteArrayInputStream body = new ByteArrayInputStream(request.getBody().getBytes());
+        return _write(request.getRequestTarget(), body);
+    }
+
+    public Response write(Request request, String location) {
+        ByteArrayInputStream body = new ByteArrayInputStream(request.getBody().getBytes());
+        Response response = _write(location, body);
+        response.setHeader("Location", location);
+
+        return response;
+    }
+
+    private Response _write(String target, InputStream body) {
+        Path targetPath = rootPath.resolve("." + target).normalize();
 
         try {
-            ByteArrayInputStream body = new ByteArrayInputStream(request.getBody().getBytes());
             if (Files.exists(targetPath)) {
                 Files.copy(body, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 return Response.create();
             } else {
+                Files.createDirectories(targetPath.getParent());
                 Files.copy(body, targetPath);
                 return Response.create(StatusCode.CREATED);
             }
