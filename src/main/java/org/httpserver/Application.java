@@ -12,6 +12,10 @@ import java.nio.file.Paths;
 import javaslang.Function1;
 import javaslang.collection.Queue;
 
+import org.jparsec.error.ParserException;
+
+import org.httpserver.parse.Http;
+
 public class Application {
     Queue<Route> routes = Queue.empty();
 
@@ -64,16 +68,13 @@ public class Application {
                     Response response;
 
                     try {
-                        Request request = new HttpParser(reader).request();
+                        Request request = Http.request(reader);
                         response = getServer().handle(request);
                         writeHttpMessage(response, os);
-                    } catch (IOException pe) {
+                    } catch (IOException ioe) {
                         response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
                         writeHttpMessage(response, os);
-                    } catch (ParseException pe) {
-                        response = Response.create(StatusCode.BAD_REQUEST);
-                        writeHttpMessage(response, os);
-                    } catch (TokenMgrError tme) {
+                    } catch (ParserException pe) {
                         response = Response.create(StatusCode.BAD_REQUEST);
                         writeHttpMessage(response, os);
                     }

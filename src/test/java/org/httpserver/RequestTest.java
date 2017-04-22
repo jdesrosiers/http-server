@@ -8,78 +8,87 @@ import org.junit.runner.RunWith;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
-import java.io.StringReader;
 
-import javaslang.control.Try;
+import javaslang.collection.HashMap;
+import javaslang.control.Option;
+import javaslang.Tuple;
 
 @RunWith(DataProviderRunner.class)
 public class RequestTest {
 
     @DataProvider
-    public static Object[][] dataProviderHttpMethods() {
-    	return new Object[][] {
-    		{ "GET" },
-    		{ "HEAD" },
-    		{ "POST" },
-    		{ "PUT" },
-    		{ "DELETE" },
-    		{ "OPTIONS" }
-    	};
+    public static Object[][] dataProviderMethods() {
+        return new Object[][] {
+            { "GET" },
+            { "POST" }
+        };
     }
 
     @Test
-    @UseDataProvider("dataProviderHttpMethods")
-    public void itShouldGetTheMethodFromTheMessage(String method) {
-        String message = "";
-        message += method + " /hello.html HTTP/1.1\r\n";
-        message += "User-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.7l zlib/1.2.3\r\n";
-        message += "Host: www.example.com\r\n";
-        message += "Accept-Language: en, mi\r\n";
-
-        StringReader in = new StringReader(message);
-
-        Request request = Try.of(() -> new HttpParser(in).request()).get();
+    @UseDataProvider("dataProviderMethods")
+    public void itShouldAllowGettingTheMethod(String method) {
+        Request request = new Request(method, "/hello.txt", HashMap.empty(), "foo");
         assertThat(request.getMethod(), equalTo(method));
     }
 
     @DataProvider
-    public static Object[][] dataProviderUris() {
-    	return new Object[][] {
-    		{ "/" },
-            { "/hello.html" },
-            { "/foo/hello.html" },
-            { "/foo/bar/hello.html" },
-            { "/hello.html?foo=bar" }
-    	};
+    public static Object[][] dataProviderRequestTargets() {
+        return new Object[][] {
+            { "/" },
+            { "/hello.txt" }
+        };
     }
 
     @Test
-    @UseDataProvider("dataProviderUris")
-    public void itShouldGetTheRequestTargetFromTheMessage(String uri) {
-        String message = "";
-        message += "GET " + uri + " HTTP/1.1\r\n";
-        message += "User-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.7l zlib/1.2.3\r\n";
-        message += "Host: www.example.com\r\n";
-        message += "Accept-Language: en, mi\r\n";
+    @UseDataProvider("dataProviderRequestTargets")
+    public void itShouldAllowGettingTheRequestTarget(String requestTarget) {
+        Request request = new Request("GET", requestTarget, HashMap.empty(), "foo");
+        assertThat(request.getRequestTarget(), equalTo(requestTarget));
+    }
 
-        StringReader in = new StringReader(message);
-
-        Request request = Try.of(() -> new HttpParser(in).request()).get();
-        assertThat(request.getRequestTarget(), equalTo(uri));
+    @DataProvider
+    public static Object[][] dataProviderHeaders() {
+        return new Object[][] {
+            { HashMap.empty(), Option.none() },
+            { HashMap.ofEntries(Tuple.of("Content-Type", "image/png")), Option.none() },
+            { HashMap.ofEntries(Tuple.of("Content-Length", "3")), Option.of("3") },
+            { HashMap.ofEntries(Tuple.of("Content-Length", "3"), Tuple.of("Content-Type", "image/png")), Option.of("3") },
+            { HashMap.ofEntries(Tuple.of("content-length", "3")), Option.of("3") },
+        };
     }
 
     @Test
-    public void itShouldHaveAStringRepresentationThatMatchesTheOriginalRequest() {
-        String message = "";
-        message += "GET /hello.html HTTP/1.1\r\n";
-        message += "User-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.7l zlib/1.2.3\r\n";
-        message += "Host: www.example.com\r\n";
-        message += "Accept-Language: en, mi\r\n";
+    @UseDataProvider("dataProviderHeaders")
+    public void itShouldAllowGettingTheMethod(HashMap<String, String>  headers, Option expected) {
+        Request request = new Request("GET", "/hello.txt", headers, "foo");
+        assertThat(request.getHeader("Content-Length"), equalTo(expected));
+    }
 
-        StringReader in = new StringReader(message);
+    @Test
+    public void itShouldAllowSettingHeaders() {
+        Request request = new Request("GET", "/hello.txt", HashMap.empty(), "foo");
+        request.setHeader("Content-Length", "3");
+        assertThat(request.getHeader("Content-Length"), equalTo(Option.of("3")));
+    }
 
-        Request request = Try.of(() -> new HttpParser(in).request()).get();
-        assertThat(request.toString(), equalTo("GET /hello.html HTTP/1.1\r\n"));
+    @Test
+    public void matchingHeadersShouldBeCaseInsensitive() {
+        Request request = new Request("GET", "/hello.txt", HashMap.empty(), "foo");
+        request.setHeader("Content-Length", "3");
+        assertThat(request.getHeader("content-length"), equalTo(Option.of("3")));
+    }
+
+    @Test
+    public void isShouldAllowGettingTheBody() {
+        Request request = new Request("GET", "/hello.txt", HashMap.empty(), "foo");
+        assertThat(request.getBody(), equalTo("foo"));
+    }
+
+    @Test
+    public void isShouldAllowSettingTheBody() {
+        Request request = new Request("GET", "/hello.txt", HashMap.empty(), "foo");
+        request.setBody("bar");
+        assertThat(request.getBody(), equalTo("bar"));
     }
 
 }
