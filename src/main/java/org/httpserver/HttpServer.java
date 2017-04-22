@@ -22,8 +22,8 @@ class HttpServer {
 
         app.get("/patch-content.txt", fileSystemController::get);
         app.patch("/patch-content.txt", (request) -> {
-            Response response = Response.create(StatusCode.NO_CONTENT);
-            response.setHeader("Content-Type", "text/plain");
+            Response response = fileSystemController.write(request);
+            response.setStatusCode(StatusCode.NO_CONTENT);
 
             return response;
         });
@@ -63,8 +63,22 @@ class HttpServer {
         app.get("/method_options2", fileSystemController::get);
 
         app.get("/logs", (request) -> {
-            Response response = Response.create(StatusCode.UNAUTHORIZED);
-            response.setHeader("WWW-Authenticate", "Basic realm-\"httpserver-logs\"");
+            String auth = request.getHeader("Authorization").getOrElse("");
+            if (auth.equals("Basic YWRtaW46aHVudGVyMg==")) {
+                return fileSystemController.get(request);
+            } else {
+                Response response = Response.create(StatusCode.UNAUTHORIZED);
+                response.setHeader("WWW-Authenticate", "Basic realm-\"httpserver-logs\"");
+
+                return response;
+            }
+        });
+
+        app.get("/tea", (request) -> Response.create());
+        app.get("/coffee", (request) -> {
+            Response response = Response.create(StatusCode.IM_A_TEAPOT);
+            response.setBody("I'm a teapot");
+
             return response;
         });
 

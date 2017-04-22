@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 
 import javaslang.Function1;
 import javaslang.collection.Queue;
@@ -69,6 +70,7 @@ public class Application {
 
                     try {
                         Request request = Http.request(reader);
+                        System.out.println(String.format("%s: %s %s HTTP/1.1", LocalDateTime.now(), request.getMethod(), request.getRequestTarget()));
                         response = getServer().handle(request);
                         writeHttpMessage(response, os);
                     } catch (IOException ioe) {
