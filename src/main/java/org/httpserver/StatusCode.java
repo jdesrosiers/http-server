@@ -43,6 +43,7 @@ public class StatusCode {
     public static final int UNSUPPORTED_MEDIA_TYPE = 415;
     public static final int RANGE_NOT_SATISFIABLE = 416;
     public static final int EXPECTATION_FAILED = 417;
+    public static final int IM_A_TEAPOT = 418;
     public static final int UPGRADE_REQUIRED = 426;
 
     public static final int INTERNAL_SERVER_ERROR = 500;
@@ -95,6 +96,7 @@ public class StatusCode {
         Tuple.of(RANGE_NOT_SATISFIABLE, "Range Not Satisfiable"),
         Tuple.of(EXPECTATION_FAILED, "Expectation Failed"),
         Tuple.of(UPGRADE_REQUIRED, "Upgrade Required"),
+        Tuple.of(IM_A_TEAPOT, "I'm a teapot"),
 
         // 5XX
         Tuple.of(INTERNAL_SERVER_ERROR, "Internal Server Error"),

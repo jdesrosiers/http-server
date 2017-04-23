@@ -1,16 +1,22 @@
 package org.httpserver;
 
-import java.io.InputStreamReader;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 
-import javaslang.Function1;
 import javaslang.collection.Queue;
+import javaslang.Function1;
+
+import org.jparsec.error.ParserException;
+
+import org.httpserver.parse.Http;
+import org.util.FileSystem;
 
 public class Application {
     Queue<Route> routes = Queue.empty();
@@ -64,16 +70,14 @@ public class Application {
                     Response response;
 
                     try {
-                        Request request = new HttpParser(reader).request();
+                        Request request = Http.request(reader);
+                        System.out.println(String.format("%s: %s %s HTTP/1.1", LocalDateTime.now(), request.getMethod(), request.getRequestTarget()));
                         response = getServer().handle(request);
                         writeHttpMessage(response, os);
-                    } catch (IOException pe) {
+                    } catch (IOException ioe) {
                         response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
                         writeHttpMessage(response, os);
-                    } catch (ParseException pe) {
-                        response = Response.create(StatusCode.BAD_REQUEST);
-                        writeHttpMessage(response, os);
-                    } catch (TokenMgrError tme) {
+                    } catch (ParserException pe) {
                         response = Response.create(StatusCode.BAD_REQUEST);
                         writeHttpMessage(response, os);
                     }

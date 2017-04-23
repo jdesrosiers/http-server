@@ -1,18 +1,19 @@
 package org.httpserver;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+
 import javaslang.collection.HashMap;
 import javaslang.collection.Map;
 import javaslang.control.Option;
-
-import java.io.PrintWriter;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.IOException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-
 import javaslang.control.Try;
+
+import org.util.FileSystem;
 
 public class Response {
     private int statusCode;

@@ -9,8 +9,8 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
-import javaslang.control.Option;
 import javaslang.collection.HashMap;
+import javaslang.control.Option;
 
 @RunWith(DataProviderRunner.class)
 public class ApplicationTest {

@@ -1,6 +1,8 @@
 package org.httpserver;
 
 import javaslang.collection.Map;
+import javaslang.control.Option;
+import javaslang.Tuple;
 
 public class Request {
     private String method;
@@ -11,7 +13,7 @@ public class Request {
     public Request(String method, String requestTarget, Map<String, String> headers, String body) {
         this.method = method;
         this.requestTarget = requestTarget;
-        this.headers = headers;
+        this.headers = headers.map((key, value) -> Tuple.of(key.toLowerCase(), value));
         this.body = body;
     }
 
@@ -23,12 +25,19 @@ public class Request {
         return requestTarget;
     }
 
+    public Option<String> getHeader(String name) {
+        return headers.get(name.toLowerCase());
+    }
+
     public String getBody() {
         return body;
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s %s HTTP/1.1\r\n", method, requestTarget);
+    public void setHeader(String name, String value) {
+        headers = headers.put(name.toLowerCase(), value);
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 }

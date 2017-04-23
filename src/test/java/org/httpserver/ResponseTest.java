@@ -9,14 +9,14 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
-import javaslang.collection.HashMap;
 import javaslang.collection.Map;
-import javaslang.Tuple;
+import javaslang.collection.HashMap;
 import javaslang.control.Option;
+import javaslang.Tuple;
 
-import java.io.PrintWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @RunWith(DataProviderRunner.class)
 public class ResponseTest {

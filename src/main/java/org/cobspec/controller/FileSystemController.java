@@ -1,12 +1,24 @@
-package org.httpserver;
+package org.cobspec.controller;
 
-import java.io.IOException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.stream.Collectors;
+
+import javaslang.collection.List;
+
+import org.cobspec.html.Index;
+import org.cobspec.html.Link;
+import org.cobspec.template.IndexTemplate;
+import org.httpserver.MediaType;
+import org.httpserver.Response;
+import org.httpserver.Request;
+import org.httpserver.StatusCode;
+import org.util.FileSystem;
 
 public class FileSystemController {
     private Path rootPath;
@@ -36,34 +48,21 @@ public class FileSystemController {
     }
 
     public Response index(Request request) {
-        Path targetPath = rootPath.resolve("." + request.getRequestTarget()).normalize();
-
         try {
-            StringBuilder builder = new StringBuilder();
-            builder.append("<html>");
-            builder.append("  <head>");
-            builder.append("    <title>Index - " + request.getRequestTarget() + "</title>");
-            builder.append("  </head>");
-            builder.append("  <body>");
-            builder.append("    <h1>Index - " + request.getRequestTarget() + "</h1>");
-            builder.append("    <ul>");
-
-            Files.walk(targetPath)
+            Path targetPath = rootPath.resolve("." + request.getRequestTarget()).normalize();
+            List<Link> links = List.ofAll(Files.walk(targetPath)
                 .filter(Files::isRegularFile)
-                .forEach((filePath) -> {
-                    Path href = rootPath.relativize(filePath);
-                    Path displayHref = targetPath.relativize(filePath);
-                    String item = String.format("<li><a href=\"/%s\">%s</a></li>", href, displayHref);
-                    builder.append(item);
-                });
-
-            builder.append("    </ul>");
-            builder.append("  </body>");
-            builder.append("</html>");
+                .map((filePath) -> {
+                    String href = rootPath.relativize(filePath).toString();
+                    String display = targetPath.relativize(filePath).toString();
+                    return new Link(href, display);
+                })
+                .collect(Collectors.toList()));
+            Index index = new Index(request.getRequestTarget(), links);
 
             Response response = Response.create();
             response.setHeader("Content-Type", "text/html; charset=utf-8");
-            response.setBody(builder.toString());
+            response.setBody(IndexTemplate.render(index));
 
             return response;
         } catch (IOException ioe) {

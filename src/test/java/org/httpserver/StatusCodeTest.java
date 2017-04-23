@@ -185,6 +185,11 @@ public class StatusCodeTest {
     }
 
     @Test
+    public void ImATeapotShouldBe418() {
+        assertThat(StatusCode.IM_A_TEAPOT, equalTo(418));
+    }
+
+    @Test
     public void upgradRequiredShouldBe426() {
         assertThat(StatusCode.UPGRADE_REQUIRED, equalTo(426));
     }
@@ -387,6 +392,11 @@ public class StatusCodeTest {
     @Test
     public void _417ShouldBeExpectationFailed() {
         assertThat(StatusCode.getMessage(StatusCode.EXPECTATION_FAILED), equalTo(Option.of("Expectation Failed")));
+    }
+
+    @Test
+    public void _418ShouldBeImATeapot() {
+        assertThat(StatusCode.getMessage(StatusCode.IM_A_TEAPOT), equalTo(Option.of("I'm a teapot")));
     }
 
     @Test
