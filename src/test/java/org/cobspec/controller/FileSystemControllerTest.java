@@ -1,4 +1,4 @@
-package org.httpserver;
+package org.cobspec.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -10,12 +10,16 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
-import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.io.IOException;
+import org.httpserver.Response;
+import org.httpserver.Request;
+import org.httpserver.StatusCode;
 
 @RunWith(DataProviderRunner.class)
 public class FileSystemControllerTest {

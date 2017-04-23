@@ -1,9 +1,9 @@
 package org.httpserver;
 
-import javaslang.control.Option;
-import javaslang.collection.Map;
 import javaslang.collection.HashMap;
 import javaslang.collection.List;
+import javaslang.collection.Map;
+import javaslang.control.Option;
 import javaslang.Tuple;
 
 public class MediaType {

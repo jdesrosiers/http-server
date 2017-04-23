@@ -1,11 +1,17 @@
-package org.httpserver;
+package org.cobspec;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 
-class HttpServer {
+import org.cobspec.controller.FileSystemController;
+import org.httpserver.Application;
+import org.httpserver.Response;
+import org.httpserver.Request;
+import org.httpserver.StatusCode;
+
+class Main {
     public static void main(String[] args) throws IOException {
         Application app = new Application();
 

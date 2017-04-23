@@ -1,18 +1,18 @@
 package org.httpserver.parse;
 
-import org.jparsec.Scanners;
-import org.jparsec.Parser;
-import org.jparsec.Parsers;
-import org.jparsec.pattern.Pattern;
-import org.jparsec.pattern.Patterns;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 
 import javaslang.collection.HashMap;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 
-import java.io.Reader;
-import java.io.BufferedReader;
-import java.io.IOException;
+import org.jparsec.pattern.Pattern;
+import org.jparsec.pattern.Patterns;
+import org.jparsec.Parser;
+import org.jparsec.Parsers;
+import org.jparsec.Scanners;
 
 import static org.httpserver.parse.Abnf.*;
 import static org.httpserver.parse.Uri.*;
