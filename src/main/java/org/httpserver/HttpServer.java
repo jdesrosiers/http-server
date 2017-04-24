@@ -17,7 +17,11 @@ class HttpServer {
     public static void main(String[] args) throws IOException {
         Application app = new Application();
 
-        FileSystemController fileSystemController = new FileSystemController(Paths.get("public"));
+        Map<String, String> arguments = Arguments.PARSER.parse(String.join(" ", args));
+        int port = Integer.valueOf(arguments.get("p").getOrElse("5000"));
+        String directory = arguments.get("d").getOrElse("public");
+
+        FileSystemController fileSystemController = new FileSystemController(Paths.get(directory));
 
         app.get("/", fileSystemController::index);
         app.get("/file1", fileSystemController::get);
@@ -90,6 +94,6 @@ class HttpServer {
             return response;
         });
 
-        app.run(5000);
+        app.run(port);
     }
 }
