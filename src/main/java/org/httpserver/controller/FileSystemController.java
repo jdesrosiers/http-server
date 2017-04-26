@@ -28,12 +28,12 @@ public class FileSystemController {
     }
 
     public Response get(Request request) {
-        Path targetPath = rootPath.resolve("." + request.getRequestTarget()).normalize();
+        Path targetPath = rootPath.resolve("." + request.getRequestTarget().getPath()).normalize();
 
         try {
             if (Files.exists(targetPath)) {
                 Response response = Response.create();
-                String extension = FileSystem.getExtension(request.getRequestTarget());
+                String extension = FileSystem.getExtension(request.getRequestTarget().getPath());
                 String contentType = MediaType.fromExtension(extension).getOrElse("application/octet-stream");
                 response.setHeader("Content-Type", contentType);
                 response.setBody(Files.newInputStream(targetPath));
@@ -49,7 +49,7 @@ public class FileSystemController {
 
     public Response index(Request request) {
         try {
-            Path targetPath = rootPath.resolve("." + request.getRequestTarget()).normalize();
+            Path targetPath = rootPath.resolve("." + request.getRequestTarget().getPath()).normalize();
             List<Link> links = List.ofAll(Files.walk(targetPath)
                 .filter(Files::isRegularFile)
                 .map((filePath) -> {
@@ -58,7 +58,7 @@ public class FileSystemController {
                     return new Link(href, display);
                 })
                 .collect(Collectors.toList()));
-            Index index = new Index(request.getRequestTarget(), links);
+            Index index = new Index(request.getRequestTarget().getPath(), links);
 
             Response response = Response.create();
             response.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -71,7 +71,7 @@ public class FileSystemController {
     }
 
     public Response delete(Request request) {
-        Path targetPath = rootPath.resolve("." + request.getRequestTarget()).normalize();
+        Path targetPath = rootPath.resolve("." + request.getRequestTarget().getPath()).normalize();
 
         try {
             Files.delete(targetPath);
@@ -83,7 +83,7 @@ public class FileSystemController {
 
     public Response write(Request request) {
         ByteArrayInputStream body = new ByteArrayInputStream(request.getBody().getBytes());
-        return _write(request.getRequestTarget(), body);
+        return _write(request.getRequestTarget().getPath(), body);
     }
 
     public Response write(Request request, String location) {

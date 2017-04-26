@@ -17,7 +17,9 @@ import org.jparsec.Scanners;
 import static org.core.parse.Abnf.*;
 import static org.core.parse.Uri.*;
 
+import org.core.OriginForm;
 import org.core.Request;
+import org.core.RequestTarget;
 
 public class Http {
     private static final Parser<Void> forwardSlash = Patterns.string("/").toScanner("/");
@@ -34,10 +36,21 @@ public class Http {
     public static final Parser<String> token = tchar.many1().toScanner("token").source();
     public static final Parser<Void> HTTPVersion = Scanners.string("HTTP/1.1", "HTTP-version");
     public static final Parser<String> absolutePath = Parsers.sequence(forwardSlash, segment).many1().source();
-    public static final Parser<String> originForm = Parsers.sequence(absolutePath, Parsers.sequence(questionMark, query).optional()).source();
-    public static final Parser<String> requestTarget = Parsers.or(originForm).source();
+    public static final Parser<OriginForm> originForm = Parsers.sequence(
+            absolutePath,
+            Parsers.sequence(
+                questionMark,
+                query,
+                (_1, q) -> q
+            ).optional(),
+            (path, q) -> new OriginForm(path, q)
+        );
+    public static final Parser<RequestTarget> requestTarget = Parsers.or(originForm);
     public static final Parser<String> method = token;
-    public static final Parser<Request> requestLine = Parsers.sequence(method, sp, requestTarget, sp, HTTPVersion, crlf, (m, s, t, r, p, c) -> new Request(m, t, HashMap.empty(), ""));
+    public static final Parser<Request> requestLine = Parsers.sequence(
+            method, sp, requestTarget, sp, HTTPVersion, crlf,
+            (m, _2, t, _3, _4, _5) -> new Request(m, t, HashMap.empty(), "")
+        );
     public static final Parser<String> fieldName = token;
     public static final Parser<String> fieldContent = Patterns.sequence(
             fieldVchar,

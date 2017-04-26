@@ -42,7 +42,7 @@ public class Server {
     }
 
     private boolean isUriMatch(Route route, Request request) {
-        return Match(route.getUriTemplate().match(request.getRequestTarget())).of(
+        return Match(route.getUriTemplate().match(request.getRequestTarget().getPath())).of(
             Case(Some($()), true),
             Case(None(), false)
         );

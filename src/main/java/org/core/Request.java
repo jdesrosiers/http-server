@@ -6,11 +6,11 @@ import javaslang.Tuple;
 
 public class Request {
     private String method;
-    private String requestTarget;
+    private RequestTarget requestTarget;
     private Map<String, String> headers;
     private String body;
 
-    public Request(String method, String requestTarget, Map<String, String> headers, String body) {
+    public Request(String method, RequestTarget requestTarget, Map<String, String> headers, String body) {
         this.method = method;
         this.requestTarget = requestTarget;
         this.headers = headers.map((key, value) -> Tuple.of(key.toLowerCase(), value));
@@ -21,7 +21,7 @@ public class Request {
         return method;
     }
 
-    public String getRequestTarget() {
+    public RequestTarget getRequestTarget() {
         return requestTarget;
     }
 
