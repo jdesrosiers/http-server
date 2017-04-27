@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
+import org.core.OriginForm;
 import org.core.Response;
 import org.core.Request;
 import org.core.StatusCode;
@@ -27,7 +28,7 @@ public class FileSystemControllerTest {
     @Test
     public void itShouldGetAFileFromTheFileSystem() {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("GET", "/file1", HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/file1"), HashMap.empty(), "");
         Response response = controller.get(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -38,7 +39,7 @@ public class FileSystemControllerTest {
     @Test
     public void itShould404WhenGettingANonexistentFileFromTheFileSystem() {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("GET", "/foobar", HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/foobar"), HashMap.empty(), "");
         Response response = controller.get(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
@@ -47,7 +48,7 @@ public class FileSystemControllerTest {
     @Test
     public void itShouldGetADirectoryListingFromTheFileSystem() {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("GET", "/", HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/"), HashMap.empty(), "");
         Response response = controller.index(request);
         String body = response.getBodyAsString();
 
@@ -62,7 +63,7 @@ public class FileSystemControllerTest {
         Files.copy(Paths.get("public/file1"), Paths.get("public/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("DELETE", "/foo", HashMap.empty(), "");
+        Request request = new Request("DELETE", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = controller.delete(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -71,7 +72,7 @@ public class FileSystemControllerTest {
     @Test
     public void itShouldPutANewFileToTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("PUT", "/foo", HashMap.empty(), "foo contents");
+        Request request = new Request("PUT", new OriginForm("/foo"), HashMap.empty(), "foo contents");
         Response response = controller.write(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.CREATED));
@@ -83,7 +84,7 @@ public class FileSystemControllerTest {
         Files.copy(Paths.get("public/file1"), Paths.get("public/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("PUT", "/foo", HashMap.empty(), "foo contents");
+        Request request = new Request("PUT", new OriginForm("/foo"), HashMap.empty(), "foo contents");
         Response response = controller.write(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));

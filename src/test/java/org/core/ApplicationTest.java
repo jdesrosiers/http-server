@@ -28,7 +28,28 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("GET", "/foo", HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/foo"), HashMap.empty(), "");
+        Response response = server.handle(request);
+
+        assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
+        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
+        assertThat(response.getBodyAsString(), equalTo("foo"));
+    }
+
+    @Test
+    public void itShouldMatchRoutesWithoutQueryParams() {
+        Application app = new Application();
+
+        app.get("/foo", (request) -> {
+            Response response = Response.create();
+            response.setBody("foo");
+
+            return response;
+        });
+
+        Server server = app.getServer();
+
+        Request request = new Request("GET", new OriginForm("/foo", "bar"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -49,7 +70,7 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("HEAD", "/foo", HashMap.empty(), "");
+        Request request = new Request("HEAD", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -70,7 +91,7 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("POST", "/foo", HashMap.empty(), "");
+        Request request = new Request("POST", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -91,7 +112,7 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("PUT", "/foo", HashMap.empty(), "");
+        Request request = new Request("PUT", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -112,7 +133,7 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("DELETE", "/foo", HashMap.empty(), "");
+        Request request = new Request("DELETE", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -134,7 +155,7 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("OPTIONS", "/foo", HashMap.empty(), "");
+        Request request = new Request("OPTIONS", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -156,7 +177,7 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("PATCH", "/foo", HashMap.empty(), "");
+        Request request = new Request("PATCH", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NO_CONTENT));
@@ -171,7 +192,7 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("GET", "/foo", HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
@@ -184,7 +205,7 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("HEAD", "/foo", HashMap.empty(), "");
+        Request request = new Request("HEAD", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
@@ -205,7 +226,7 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("GET", "/foo", HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));
@@ -230,7 +251,7 @@ public class ApplicationTest {
 
         Server server = app.getServer();
 
-        Request request = new Request("DELETE", "/foo", HashMap.empty(), "");
+        Request request = new Request("DELETE", new OriginForm("/foo"), HashMap.empty(), "");
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));

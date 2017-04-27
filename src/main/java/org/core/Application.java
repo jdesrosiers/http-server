@@ -71,7 +71,7 @@ public class Application {
 
                     try {
                         Request request = Http.request(reader);
-                        System.out.println(String.format("%s: %s %s HTTP/1.1", LocalDateTime.now(), request.getMethod(), request.getRequestTarget()));
+                        System.out.println(String.format("%s: %s %s HTTP/1.1", LocalDateTime.now(), request.getMethod(), request.getRequestTarget().toString()));
                         response = getServer().handle(request);
                         writeHttpMessage(response, os);
                     } catch (IOException ioe) {

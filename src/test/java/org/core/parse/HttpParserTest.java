@@ -20,6 +20,7 @@ import javaslang.Tuple;
 import javaslang.Tuple2;
 
 import org.core.Request;
+import org.core.RequestTarget;
 
 @RunWith(DataProviderRunner.class)
 public class HttpParserTest {
@@ -30,7 +31,7 @@ public class HttpParserTest {
 
         assertThat(request, instanceOf(Request.class));
         assertThat(request.getMethod(), equalTo("GET"));
-        assertThat(request.getRequestTarget(), equalTo("/hello.txt"));
+        assertThat(request.getRequestTarget().getPath(), equalTo("/hello.txt"));
     }
 
     @DataProvider
@@ -52,19 +53,22 @@ public class HttpParserTest {
     @DataProvider
     public static Object[][] dataProviderRequestTarget() {
         return new Object[][] {
-            { "/" },
-            { "/hello" },
-            { "/hello.txt" },
-            { "/hello.txt?" },
-            { "/hello.txt?foo" },
-            { "/hello.txt?foo=bar" }
+            { "/", "/", null },
+            { "/hello", "/hello", null },
+            { "/hello.txt", "/hello.txt", null },
+            { "/hello.txt?", "/hello.txt", "" },
+            { "/hello.txt?foo", "/hello.txt", "foo" },
+            { "/hello.txt?foo=bar", "/hello.txt", "foo=bar" },
+            { "/hello.txt?foo=bar&abc=123", "/hello.txt", "foo=bar&abc=123" }
         };
     }
 
     @Test
     @UseDataProvider("dataProviderRequestTarget")
-    public void itShouldParseRequestTarget(String subject) {
-        assertThat(Http.requestTarget.parse(subject), equalTo(subject));
+    public void itShouldParseRequestTarget(String subject, String path, String query) {
+        RequestTarget requestTarget = Http.requestTarget.parse(subject);
+        assertThat(requestTarget.getPath(), equalTo(path));
+        assertThat(requestTarget.getQuery(), equalTo(query));
     }
 
     @DataProvider
@@ -93,7 +97,7 @@ public class HttpParserTest {
         Request request = Http.request(reader);
 
         assertThat(request.getMethod(), equalTo("GET"));
-        assertThat(request.getRequestTarget(), equalTo("/hello.txt"));
+        assertThat(request.getRequestTarget().getPath(), equalTo("/hello.txt"));
         assertThat(request.getHeader("Accept"), equalTo(Option.of("text/plain; charset=utf-8")));
     }
 
@@ -111,7 +115,7 @@ public class HttpParserTest {
         Request request = Http.request(reader);
 
         assertThat(request.getMethod(), equalTo("POST"));
-        assertThat(request.getRequestTarget(), equalTo("/form"));
+        assertThat(request.getRequestTarget().getPath(), equalTo("/form"));
         assertThat(request.getHeader("Content-Length"), equalTo(Option.of("20")));
         assertThat(request.getHeader("Content-Type"), equalTo(Option.of("application/json")));
         assertThat(request.getBody(), equalTo("{ \"hello\": \"world\" }"));

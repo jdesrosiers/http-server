@@ -5,13 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 
-import org.httpserver.controller.FileSystemController;
+import javaslang.collection.Map;
+
 import org.core.Application;
 import org.core.Response;
 import org.core.Request;
 import org.core.StatusCode;
 
-import javaslang.collection.Map;
+import org.httpserver.controller.CookieController;
+import org.httpserver.controller.FileSystemController;
 
 class HttpServer {
     public static void main(String[] args) throws IOException {
@@ -54,25 +56,21 @@ class HttpServer {
         });
 
         app.get("/method_options", fileSystemController::get);
+        app.post("/method_options", (request) -> Response.create());
         app.put("/method_options", fileSystemController::write);
-
         app.options("/method_options", (request) -> {
             Response response = Response.create();
             response.setHeader("Allow", "GET,HEAD,POST,OPTIONS,PUT");
             return response;
         });
 
-        app.post("/method_options", (request) -> {
-            return Response.create();
-        });
+        app.get("/method_options2", (request) -> Response.create());
 
         app.options("/method_options2", (request) -> {
             Response response = Response.create();
             response.setHeader("Allow", "GET,OPTIONS");
             return response;
         });
-
-        app.get("/method_options2", fileSystemController::get);
 
         app.get("/logs", (request) -> {
             String auth = request.getHeader("Authorization").getOrElse("");
@@ -93,6 +91,10 @@ class HttpServer {
 
             return response;
         });
+
+        CookieController cookieController = new CookieController();
+        app.get("/cookie", cookieController::writeCookie);
+        app.get("/eat_cookie", cookieController::useCookie);
 
         app.run(port);
     }
