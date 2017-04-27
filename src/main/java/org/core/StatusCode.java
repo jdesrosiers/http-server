@@ -24,6 +24,7 @@ public class StatusCode {
     public static final int NOT_MODIFIED = 304;
     public static final int USE_PROXY = 305;
     public static final int TEMPORARY_REDIRECT = 307;
+    public static final int PERMANENT_REDIRECT = 308;
 
     public static final int BAD_REQUEST = 400;
     public static final int UNAUTHORIZED = 401;
@@ -76,6 +77,7 @@ public class StatusCode {
         Tuple.of(NOT_MODIFIED, "Not Modified"),
         Tuple.of(USE_PROXY, "Use Proxy"),
         Tuple.of(TEMPORARY_REDIRECT, "Temporary Redirect"),
+        Tuple.of(PERMANENT_REDIRECT, "Permanent Redirect"),
 
         // 4XX
         Tuple.of(BAD_REQUEST, "Bad Request"),

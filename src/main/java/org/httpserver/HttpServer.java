@@ -14,6 +14,7 @@ import org.core.StatusCode;
 
 import org.httpserver.controller.CookieController;
 import org.httpserver.controller.FileSystemController;
+import org.httpserver.controller.RedirectController;
 
 class HttpServer {
     public static void main(String[] args) throws IOException {
@@ -44,11 +45,8 @@ class HttpServer {
 
         app.post("/noop-form", (request) -> Response.create());
 
-        app.get("/redirect", (request) -> {
-            Response response = Response.create(StatusCode.FOUND);
-            response.setHeader("Location", "/");
-            return response;
-        });
+        RedirectController redirectController = new RedirectController();
+        app.get("/redirect", (request) -> redirectController.redirect(request, "/"));
 
         app.get("/method_options", (request) -> Response.create());
         app.post("/method_options", (request) -> Response.create());
