@@ -12,6 +12,7 @@ import org.core.Response;
 import org.core.Request;
 import org.core.StatusCode;
 
+import org.httpserver.controller.CoffeePotController;
 import org.httpserver.controller.CookieController;
 import org.httpserver.controller.FileSystemController;
 import org.httpserver.controller.RedirectController;
@@ -76,13 +77,9 @@ class HttpServer {
             }
         });
 
-        app.get("/tea", (request) -> Response.create());
-        app.get("/coffee", (request) -> {
-            Response response = Response.create(StatusCode.IM_A_TEAPOT);
-            response.setBody("I'm a teapot");
-
-            return response;
-        });
+        CoffeePotController coffeePotController = new CoffeePotController();
+        app.get("/tea", coffeePotController::tea);
+        app.get("/coffee", coffeePotController::coffee);
 
         CookieController cookieController = new CookieController();
         app.get("/cookie", cookieController::writeCookie);
