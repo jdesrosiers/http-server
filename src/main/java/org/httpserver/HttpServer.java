@@ -35,12 +35,7 @@ class HttpServer {
         app.get("/text-file.txt", fileSystemController::get);
 
         app.get("/patch-content.txt", fileSystemController::get);
-        app.patch("/patch-content.txt", (request) -> {
-            Response response = fileSystemController.write(request);
-            response.setStatusCode(StatusCode.NO_CONTENT);
-
-            return response;
-        });
+        app.patch("/patch-content.txt", fileSystemController::patch);
 
         app.post("/form", (request) -> fileSystemController.write(request, "/form/feline"));
         app.get("/form/feline", fileSystemController::get);
@@ -65,7 +60,6 @@ class HttpServer {
         });
 
         app.get("/method_options2", (request) -> Response.create());
-
         app.options("/method_options2", (request) -> {
             Response response = Response.create();
             response.setHeader("Allow", "GET,OPTIONS");

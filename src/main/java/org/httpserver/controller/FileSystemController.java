@@ -3,12 +3,14 @@ package org.httpserver.controller;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.stream.Collectors;
 
+import javaslang.control.Option;
 import javaslang.collection.List;
 
 import org.httpserver.html.Index;
@@ -17,6 +19,7 @@ import org.httpserver.template.IndexTemplate;
 import org.core.MediaType;
 import org.core.Response;
 import org.core.Request;
+import org.core.UnixPatch;
 import org.core.StatusCode;
 import org.util.FileSystem;
 
@@ -28,7 +31,7 @@ public class FileSystemController {
     }
 
     public Response get(Request request) {
-        Path targetPath = rootPath.resolve("." + request.getRequestTarget().getPath()).normalize();
+        Path targetPath = getTargetPath(request);
 
         try {
             if (Files.exists(targetPath)) {
@@ -49,7 +52,7 @@ public class FileSystemController {
 
     public Response index(Request request) {
         try {
-            Path targetPath = rootPath.resolve("." + request.getRequestTarget().getPath()).normalize();
+            Path targetPath = getTargetPath(request);
             List<Link> links = List.ofAll(Files.walk(targetPath)
                 .filter(Files::isRegularFile)
                 .map((filePath) -> {
@@ -71,7 +74,7 @@ public class FileSystemController {
     }
 
     public Response delete(Request request) {
-        Path targetPath = rootPath.resolve("." + request.getRequestTarget().getPath()).normalize();
+        Path targetPath = getTargetPath(request);
 
         try {
             Files.delete(targetPath);
@@ -92,6 +95,52 @@ public class FileSystemController {
         response.setHeader("Location", location);
 
         return response;
+    }
+
+    public Response patch(Request request) {
+        Path targetPath = getTargetPath(request);
+
+        if (!Files.exists(targetPath)) {
+            return Response.create(StatusCode.NOT_FOUND);
+        }
+
+        if (!isPatchTypeSupported(request.getHeader("Content-Type"))) {
+            Response response = Response.create(StatusCode.UNSUPPORTED_MEDIA_TYPE);
+            response.setHeader("Accept-Patch", "application/unix-patch");
+            return response;
+        }
+
+        try {
+            if (isIfMatch(request.getHeader("If-Match"), FileSystem.eTagFor(targetPath))) {
+                return Response.create(StatusCode.PRECONDITION_FAILED);
+            }
+
+            UnixPatch patch = UnixPatch.patch(targetPath, request.getBody());
+
+            if (patch.getStatus() != 0) {
+                Response response = Response.create(StatusCode.UNPROCESSABLE_ENTITY);
+                response.setBody(patch.getError());
+                return response;
+            } else {
+                return Response.create(StatusCode.NO_CONTENT);
+            }
+        } catch (InterruptedException ie) {
+            return Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+        } catch (IOException ioe) {
+            return Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private boolean isPatchTypeSupported(Option<String> contentType) {
+        return contentType.isDefined() && contentType.get().equals("application/unix-patch");
+    }
+
+    public boolean isIfMatch(Option<String> ifMatch, String eTag) {
+        return ifMatch.isDefined() && !ifMatch.get().toUpperCase().equals(eTag);
+    }
+
+    private Path getTargetPath(Request request) {
+        return rootPath.resolve("." + request.getRequestTarget().getPath()).normalize();
     }
 
     private Response _write(String target, InputStream body) {

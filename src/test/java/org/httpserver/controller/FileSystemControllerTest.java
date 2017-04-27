@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javaslang.Tuple;
 import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
@@ -21,6 +22,7 @@ import org.core.OriginForm;
 import org.core.Response;
 import org.core.Request;
 import org.core.StatusCode;
+import org.util.FileSystem;
 
 @RunWith(DataProviderRunner.class)
 public class FileSystemControllerTest {
@@ -76,7 +78,7 @@ public class FileSystemControllerTest {
         Response response = controller.write(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.CREATED));
-        assertThat(new String(Files.readAllBytes(Paths.get("public/foo"))), equalTo("foo contents"));
+        assertThat(FileSystem.fileToString(Paths.get("public/foo")), equalTo("foo contents"));
     }
 
     @Test
@@ -88,7 +90,92 @@ public class FileSystemControllerTest {
         Response response = controller.write(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(new String(Files.readAllBytes(Paths.get("public/foo"))), equalTo("foo contents"));
+        assertThat(FileSystem.fileToString(Paths.get("public/foo")), equalTo("foo contents"));
+    }
+
+    @Test
+    public void itShouldOnlyAcceptPatchRequestsInUnixDiffFormat() throws IOException {
+        Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
+
+        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        HashMap<String, String> requestHeaders = HashMap.ofEntries(
+            Tuple.of("Content-Type", "text/plain; charset=utf-8")
+        );
+        Request request = new Request("PATCH", new OriginForm("/foo"), requestHeaders, "foo contents");
+        Response response = controller.patch(request);
+
+        assertThat(response.getStatusCode(), equalTo(StatusCode.UNSUPPORTED_MEDIA_TYPE));
+        assertThat(response.getHeader("Accept-Patch"), equalTo(Option.of("application/unix-patch")));
+    }
+
+    @Test
+    public void itShould404OnAPatchRequestToANonexistentResource() throws IOException {
+        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        HashMap<String, String> requestHeaders = HashMap.ofEntries(
+            Tuple.of("Content-Type", "application/unix-patch")
+        );
+
+        StringBuilder patch = new StringBuilder();
+        patch.append("1c1\n");
+        patch.append("< default content\n");
+        patch.append("\\ No newline at end of file\n");
+        patch.append("---\n");
+        patch.append("> foo content\n");
+        patch.append("\\ No newline at end of file\n");
+
+        Request request = new Request("PATCH", new OriginForm("/foo"), requestHeaders, patch.toString());
+        Response response = controller.patch(request);
+
+        assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
+    }
+
+    @Test
+    public void itShould412WhenTryingToPatchAndEtagsDontMatch() throws IOException {
+        Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
+
+        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        HashMap<String, String> requestHeaders = HashMap.ofEntries(
+            Tuple.of("Content-Type", "application/unix-patch"),
+            Tuple.of("If-Match", "xxx")
+        );
+
+        StringBuilder patch = new StringBuilder();
+        patch.append("1c1\n");
+        patch.append("< default content\n");
+        patch.append("\\ No newline at end of file\n");
+        patch.append("---\n");
+        patch.append("> foo content\n");
+        patch.append("\\ No newline at end of file\n");
+
+        Request request = new Request("PATCH", new OriginForm("/foo"), requestHeaders, patch.toString());
+        Response response = controller.patch(request);
+
+        assertThat(response.getStatusCode(), equalTo(StatusCode.PRECONDITION_FAILED));
+    }
+
+    @Test
+    public void itShouldPatchADocument() throws IOException {
+        Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
+
+        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        HashMap<String, String> requestHeaders = HashMap.ofEntries(
+            Tuple.of("Content-Type", "application/unix-patch"),
+            Tuple.of("If-Match", "dc50a0d27dda2eee9f65644cd7e4c9cf11de8bec")
+        );
+
+        StringBuilder patch = new StringBuilder();
+        patch.append("1c1\n");
+        patch.append("< default content\n");
+        patch.append("\\ No newline at end of file\n");
+        patch.append("---\n");
+        patch.append("> foo content\n");
+        patch.append("\\ No newline at end of file\n");
+
+        Request request = new Request("PATCH", new OriginForm("/foo"), requestHeaders, patch.toString());
+        Response response = controller.patch(request);
+
+        assertThat(response.getStatusCode(), equalTo(StatusCode.NO_CONTENT));
+        assertThat(FileSystem.fileToString(Paths.get("public/foo")), equalTo("foo content"));
     }
 
     @After
