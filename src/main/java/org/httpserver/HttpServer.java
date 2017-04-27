@@ -50,7 +50,7 @@ class HttpServer {
             return response;
         });
 
-        app.get("/method_options", fileSystemController::get);
+        app.get("/method_options", (request) -> Response.create());
         app.post("/method_options", (request) -> Response.create());
         app.put("/method_options", fileSystemController::write);
         app.options("/method_options", (request) -> {

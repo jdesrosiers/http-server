@@ -24,7 +24,11 @@ public class Server {
                 response = defaultResponse(StatusCode.METHOD_NOT_ALLOWED);
                 response.setHeader("Allow", buildAllowHeader(resourceMatches));
             } else {
-                response = methodMatches.head().getController().apply(request);
+                try {
+                    response = methodMatches.head().getController().apply(request);
+                } catch (Throwable e) {
+                    response = defaultResponse(StatusCode.INTERNAL_SERVER_ERROR);
+                }
             }
         }
 

@@ -28,7 +28,7 @@ import org.util.FileSystem;
 public class FileSystemControllerTest {
 
     @Test
-    public void itShouldGetAFileFromTheFileSystem() {
+    public void itShouldGetAFileFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
         Request request = new Request("GET", new OriginForm("/file1"), HashMap.empty(), "");
         Response response = controller.get(request);
@@ -39,7 +39,7 @@ public class FileSystemControllerTest {
     }
 
     @Test
-    public void itShould404WhenGettingANonexistentFileFromTheFileSystem() {
+    public void itShould404WhenGettingANonexistentFileFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
         Request request = new Request("GET", new OriginForm("/foobar"), HashMap.empty(), "");
         Response response = controller.get(request);
@@ -48,7 +48,7 @@ public class FileSystemControllerTest {
     }
 
     @Test
-    public void itShouldGetADirectoryListingFromTheFileSystem() {
+    public void itShouldGetADirectoryListingFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
         Request request = new Request("GET", new OriginForm("/"), HashMap.empty(), "");
         Response response = controller.index(request);
@@ -94,7 +94,7 @@ public class FileSystemControllerTest {
     }
 
     @Test
-    public void itShouldOnlyAcceptPatchRequestsInUnixDiffFormat() throws IOException {
+    public void itShouldOnlyAcceptPatchRequestsInUnixDiffFormat() throws IOException, InterruptedException {
         Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
@@ -109,7 +109,7 @@ public class FileSystemControllerTest {
     }
 
     @Test
-    public void itShould404OnAPatchRequestToANonexistentResource() throws IOException {
+    public void itShould404OnAPatchRequestToANonexistentResource() throws IOException, InterruptedException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
         HashMap<String, String> requestHeaders = HashMap.ofEntries(
             Tuple.of("Content-Type", "application/unix-patch")
@@ -130,7 +130,7 @@ public class FileSystemControllerTest {
     }
 
     @Test
-    public void itShould412WhenTryingToPatchAndEtagsDontMatch() throws IOException {
+    public void itShould412WhenTryingToPatchAndEtagsDontMatch() throws IOException, InterruptedException {
         Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
@@ -154,7 +154,7 @@ public class FileSystemControllerTest {
     }
 
     @Test
-    public void itShouldPatchADocument() throws IOException {
+    public void itShouldPatchADocument() throws IOException, InterruptedException {
         Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
