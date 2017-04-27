@@ -92,7 +92,7 @@ public class FileSystemController {
 
         if (!isPatchTypeSupported(request.getHeader("Content-Type"))) {
             Response response = Response.create(StatusCode.UNSUPPORTED_MEDIA_TYPE);
-            response.setHeader("Accept-Patch", "application/unix-patch");
+            response.setHeader("Accept-Patch", "application/unix-diff");
             return response;
         }
 
@@ -112,7 +112,7 @@ public class FileSystemController {
     }
 
     private boolean isPatchTypeSupported(Option<String> contentType) {
-        return contentType.isDefined() && contentType.get().equals("application/unix-patch");
+        return contentType.isDefined() && contentType.get().equals("application/unix-diff");
     }
 
     public boolean isIfMatch(Option<String> ifMatch, String eTag) {

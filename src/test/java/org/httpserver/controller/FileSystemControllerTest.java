@@ -105,14 +105,14 @@ public class FileSystemControllerTest {
         Response response = controller.patch(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.UNSUPPORTED_MEDIA_TYPE));
-        assertThat(response.getHeader("Accept-Patch"), equalTo(Option.of("application/unix-patch")));
+        assertThat(response.getHeader("Accept-Patch"), equalTo(Option.of("application/unix-diff")));
     }
 
     @Test
     public void itShould404OnAPatchRequestToANonexistentResource() throws IOException, InterruptedException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
         HashMap<String, String> requestHeaders = HashMap.ofEntries(
-            Tuple.of("Content-Type", "application/unix-patch")
+            Tuple.of("Content-Type", "application/unix-diff")
         );
 
         StringBuilder patch = new StringBuilder();
@@ -135,7 +135,7 @@ public class FileSystemControllerTest {
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
         HashMap<String, String> requestHeaders = HashMap.ofEntries(
-            Tuple.of("Content-Type", "application/unix-patch"),
+            Tuple.of("Content-Type", "application/unix-diff"),
             Tuple.of("If-Match", "xxx")
         );
 
@@ -159,7 +159,7 @@ public class FileSystemControllerTest {
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
         HashMap<String, String> requestHeaders = HashMap.ofEntries(
-            Tuple.of("Content-Type", "application/unix-patch"),
+            Tuple.of("Content-Type", "application/unix-diff"),
             Tuple.of("If-Match", "dc50a0d27dda2eee9f65644cd7e4c9cf11de8bec")
         );
 
