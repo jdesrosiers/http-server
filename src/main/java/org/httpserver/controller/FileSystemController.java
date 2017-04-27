@@ -16,6 +16,10 @@ import javaslang.collection.List;
 import org.httpserver.html.Index;
 import org.httpserver.html.Link;
 import org.httpserver.template.IndexTemplate;
+import org.core.exception.HttpException;
+import org.core.exception.NotFoundHttpException;
+import org.core.exception.PreconditionFailedHttpException;
+import org.core.exception.UnsupportedMediaTypeHttpException;
 import org.core.MediaType;
 import org.core.Response;
 import org.core.Request;
@@ -33,21 +37,26 @@ public class FileSystemController {
     public Response get(Request request) throws IOException {
         Path targetPath = getTargetPath(request);
 
-        if (Files.exists(targetPath)) {
-            Response response = Response.create();
-            String extension = FileSystem.getExtension(request.getRequestTarget().getPath());
-            String contentType = MediaType.fromExtension(extension).getOrElse("application/octet-stream");
-            response.setHeader("Content-Type", contentType);
-            response.setBody(Files.newInputStream(targetPath));
-
-            return response;
-        } else {
-            return Response.create(StatusCode.NOT_FOUND);
+        if (!Files.exists(targetPath)) {
+            throw new NotFoundHttpException();
         }
+
+        Response response = Response.create();
+        String extension = FileSystem.getExtension(request.getRequestTarget().getPath());
+        String contentType = MediaType.fromExtension(extension).getOrElse("application/octet-stream");
+        response.setHeader("Content-Type", contentType);
+        response.setBody(Files.newInputStream(targetPath));
+
+        return response;
     }
 
     public Response index(Request request) throws IOException {
         Path targetPath = getTargetPath(request);
+
+        if (!Files.exists(targetPath)) {
+            throw new NotFoundHttpException();
+        }
+
         List<Link> links = List.ofAll(Files.walk(targetPath)
             .filter(Files::isRegularFile)
             .map((filePath) -> {
@@ -87,17 +96,17 @@ public class FileSystemController {
         Path targetPath = getTargetPath(request);
 
         if (!Files.exists(targetPath)) {
-            return Response.create(StatusCode.NOT_FOUND);
+            throw new NotFoundHttpException();
         }
 
         if (!isPatchTypeSupported(request.getHeader("Content-Type"))) {
-            Response response = Response.create(StatusCode.UNSUPPORTED_MEDIA_TYPE);
-            response.setHeader("Accept-Patch", "application/unix-diff");
-            return response;
+            HttpException he = new UnsupportedMediaTypeHttpException();
+            he.setHeader("Accept-Patch", "application/unix-diff");
+            throw he;
         }
 
         if (isIfMatch(request.getHeader("If-Match"), FileSystem.eTagFor(targetPath))) {
-            return Response.create(StatusCode.PRECONDITION_FAILED);
+            throw new PreconditionFailedHttpException();
         }
 
         UnixPatch patch = UnixPatch.patch(targetPath, request.getBody());

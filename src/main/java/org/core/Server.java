@@ -4,6 +4,8 @@ import javaslang.collection.List;
 import static javaslang.API.*;
 import static javaslang.Patterns.*;
 
+import org.core.exception.HttpException;
+
 public class Server {
     List<Route> routes;
 
@@ -26,6 +28,9 @@ public class Server {
             } else {
                 try {
                     response = methodMatches.head().getController().apply(request);
+                } catch (HttpException he) {
+                    response = defaultResponse(he.getStatusCode());
+                    he.getHeaders().forEach(response::setHeader);
                 } catch (Throwable e) {
                     response = defaultResponse(StatusCode.INTERNAL_SERVER_ERROR);
                 }

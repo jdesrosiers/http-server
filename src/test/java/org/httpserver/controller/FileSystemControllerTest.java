@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import org.junit.Test;
 import org.junit.After;
+import static org.junit.Assert.fail;
 import org.junit.runner.RunWith;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -18,6 +19,9 @@ import javaslang.Tuple;
 import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
+import org.core.exception.NotFoundHttpException;
+import org.core.exception.PreconditionFailedHttpException;
+import org.core.exception.UnsupportedMediaTypeHttpException;
 import org.core.OriginForm;
 import org.core.Response;
 import org.core.Request;
@@ -38,13 +42,11 @@ public class FileSystemControllerTest {
         assertThat(response.getBodyAsString(), equalTo("file1 contents"));
     }
 
-    @Test
+    @Test(expected=NotFoundHttpException.class)
     public void itShould404WhenGettingANonexistentFileFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
         Request request = new Request("GET", new OriginForm("/foobar"));
         Response response = controller.get(request);
-
-        assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
     }
 
     @Test
@@ -103,13 +105,16 @@ public class FileSystemControllerTest {
         Request request = new Request("PATCH", new OriginForm("/foo"));
         request.setBody("foo contents");
         request.setHeader("Content-Type", "text/plain; charset=utf-8");
-        Response response = controller.patch(request);
 
-        assertThat(response.getStatusCode(), equalTo(StatusCode.UNSUPPORTED_MEDIA_TYPE));
-        assertThat(response.getHeader("Accept-Patch"), equalTo(Option.of("application/unix-diff")));
+        try {
+            Response response = controller.patch(request);
+            fail();
+        } catch (UnsupportedMediaTypeHttpException he) {
+            assertThat(he.getHeader("Accept-Patch"), equalTo(Option.of("application/unix-diff")));
+        }
     }
 
-    @Test
+    @Test(expected=NotFoundHttpException.class)
     public void itShould404OnAPatchRequestToANonexistentResource() throws IOException, InterruptedException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
 
@@ -129,7 +134,7 @@ public class FileSystemControllerTest {
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
     }
 
-    @Test
+    @Test(expected=PreconditionFailedHttpException.class)
     public void itShould412WhenTryingToPatchAndEtagsDontMatch() throws IOException, InterruptedException {
         Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
 
@@ -148,8 +153,6 @@ public class FileSystemControllerTest {
         request.setHeader("If-Match", "xxx");
         request.setBody(patch.toString());
         Response response = controller.patch(request);
-
-        assertThat(response.getStatusCode(), equalTo(StatusCode.PRECONDITION_FAILED));
     }
 
     @Test

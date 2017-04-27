@@ -5,8 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 
+import javaslang.collection.List;
 import javaslang.collection.Map;
 
+import org.core.exception.UnauthorizedHttpException;
 import org.core.Application;
 import org.core.Response;
 import org.core.Request;
@@ -65,16 +67,14 @@ class HttpServer {
             return response;
         });
 
+        List<String> authorizedUsers = List.of("Basic YWRtaW46aHVudGVyMg==");
         app.get("/logs", (request) -> {
             String auth = request.getHeader("Authorization").getOrElse("");
-            if (auth.equals("Basic YWRtaW46aHVudGVyMg==")) {
-                return fileSystemController.get(request);
-            } else {
-                Response response = Response.create(StatusCode.UNAUTHORIZED);
-                response.setHeader("WWW-Authenticate", "Basic realm-\"httpserver-logs\"");
-
-                return response;
+            if (!authorizedUsers.contains(auth)) {
+                throw new UnauthorizedHttpException("Basic realm-\"httpserver-logs\"");
             }
+
+            return fileSystemController.get(request);
         });
 
         CoffeePotController coffeePotController = new CoffeePotController();
