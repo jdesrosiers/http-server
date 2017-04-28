@@ -3,6 +3,12 @@ package org.util;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.MessageDigest;
+import javax.xml.bind.DatatypeConverter;
+
+import javaslang.control.Try;
 
 public class FileSystem {
     public static String getExtension(String path) {
@@ -22,5 +28,18 @@ public class FileSystem {
             out.write(buffer, 0, size);
             size = in.read(buffer);
         }
+    }
+
+    public static String fileToString(Path path) throws IOException {
+        byte[] bytes = Files.readAllBytes(path);
+        return new String(bytes);
+    }
+
+    public static String eTagFor(Path path) {
+        return Try.of(() -> {
+            byte[] contents = Files.readAllBytes(path);
+            byte[] hash = MessageDigest.getInstance("SHA1").digest(contents);
+            return DatatypeConverter.printHexBinary(hash);
+        }).get();
     }
 }

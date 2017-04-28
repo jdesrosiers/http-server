@@ -1,13 +1,13 @@
 package org.core;
 
-import javaslang.Function1;
+import javaslang.CheckedFunction1;
 
 public class Route {
     private String method;
     private UriTemplate uriTemplate;
-    private Function1<Request, Response> controller;
+    private CheckedFunction1<Request, Response> controller;
 
-    public Route(String method, UriTemplate uriTemplate, Function1<Request, Response> controller) {
+    public Route(String method, UriTemplate uriTemplate, CheckedFunction1<Request, Response> controller) {
         this.method = method;
         this.uriTemplate = uriTemplate;
         this.controller = controller;
@@ -21,7 +21,7 @@ public class Route {
         return uriTemplate;
     }
 
-    public Function1<Request, Response> getController() {
+    public CheckedFunction1<Request, Response> getController() {
         return controller;
     }
 }

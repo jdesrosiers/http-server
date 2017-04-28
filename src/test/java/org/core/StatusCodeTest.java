@@ -190,6 +190,11 @@ public class StatusCodeTest {
     }
 
     @Test
+    public void UnprocessableEntityShouldBe422() {
+        assertThat(StatusCode.UNPROCESSABLE_ENTITY, equalTo(422));
+    }
+
+    @Test
     public void upgradRequiredShouldBe426() {
         assertThat(StatusCode.UPGRADE_REQUIRED, equalTo(426));
     }
@@ -397,6 +402,11 @@ public class StatusCodeTest {
     @Test
     public void _418ShouldBeImATeapot() {
         assertThat(StatusCode.getMessage(StatusCode.IM_A_TEAPOT), equalTo(Option.of("I'm a teapot")));
+    }
+
+    @Test
+    public void _422ShouldBeUnprocessableEntity() {
+        assertThat(StatusCode.getMessage(StatusCode.UNPROCESSABLE_ENTITY), equalTo(Option.of("Unprocessable Entity")));
     }
 
     @Test

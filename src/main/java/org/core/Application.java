@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 import javaslang.collection.Queue;
-import javaslang.Function1;
+import javaslang.CheckedFunction1;
 
 import org.jparsec.error.ParserException;
 
@@ -21,7 +21,7 @@ import org.util.FileSystem;
 public class Application {
     Queue<Route> routes = Queue.empty();
 
-    public Route match(String method, String uriTemplate, Function1<Request, Response> controller) {
+    public Route match(String method, String uriTemplate, CheckedFunction1<Request, Response> controller) {
         Route route = new Route(method, new UriTemplate(uriTemplate), controller);
 
         routes = routes.enqueue(route);
@@ -29,27 +29,27 @@ public class Application {
         return route;
     }
 
-    public Route get(String uriTemplate, Function1<Request, Response> controller) {
+    public Route get(String uriTemplate, CheckedFunction1<Request, Response> controller) {
         return match("GET", uriTemplate, controller);
     }
 
-    public Route post(String uriTemplate, Function1<Request, Response> controller) {
+    public Route post(String uriTemplate, CheckedFunction1<Request, Response> controller) {
         return match("POST", uriTemplate, controller);
     }
 
-    public Route put(String uriTemplate, Function1<Request, Response> controller) {
+    public Route put(String uriTemplate, CheckedFunction1<Request, Response> controller) {
         return match("PUT", uriTemplate, controller);
     }
 
-    public Route delete(String uriTemplate, Function1<Request, Response> controller) {
+    public Route delete(String uriTemplate, CheckedFunction1<Request, Response> controller) {
         return match("DELETE", uriTemplate, controller);
     }
 
-    public Route options(String uriTemplate, Function1<Request, Response> controller) {
+    public Route options(String uriTemplate, CheckedFunction1<Request, Response> controller) {
         return match("OPTIONS", uriTemplate, controller);
     }
 
-    public Route patch(String uriTemplate, Function1<Request, Response> controller) {
+    public Route patch(String uriTemplate, CheckedFunction1<Request, Response> controller) {
         return match("PATCH", uriTemplate, controller);
     }
 
@@ -58,12 +58,9 @@ public class Application {
     }
 
     public void run(int port) throws IOException {
-        ServerSocket listener = new ServerSocket(port);
-
-        try {
+        try(ServerSocket listener = new ServerSocket(port)) {
             while (true) {
-                Socket socket = listener.accept();
-                try {
+                try(Socket socket = listener.accept()) {
                     InputStreamReader reader = new InputStreamReader(socket.getInputStream());
                     OutputStream os = socket.getOutputStream();
                     PrintWriter out = new PrintWriter(os, true);
@@ -81,12 +78,8 @@ public class Application {
                         response = Response.create(StatusCode.BAD_REQUEST);
                         writeHttpMessage(response, os);
                     }
-                } finally {
-                    socket.close();
                 }
             }
-        } finally {
-            listener.close();
         }
     }
 
