@@ -33,6 +33,12 @@ dependencies {
 // Define the main class for the application
 mainClassName = 'org.httpserver.HttpServer'
 
+run {
+    if (project.hasProperty("appArgs")) {
+        args appArgs
+    }
+}
+
 test {
     testLogging {
         events "passed", "skipped", "failed", "standardOut", "standardError"

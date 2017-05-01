@@ -59,6 +59,7 @@ public class Application {
 
     public void run(int port) throws IOException {
         try(ServerSocket listener = new ServerSocket(port)) {
+            System.out.println("Server running at http://localhost:" + port);
             while (true) {
                 try(Socket socket = listener.accept()) {
                     InputStreamReader reader = new InputStreamReader(socket.getInputStream());
