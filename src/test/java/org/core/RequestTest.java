@@ -27,7 +27,8 @@ public class RequestTest {
     @Test
     @UseDataProvider("dataProviderMethods")
     public void itShouldAllowGettingTheMethod(String method) {
-        Request request = new Request(method, new OriginForm("/hello.txt"), HashMap.empty(), "foo");
+        Request request = new Request(method, new OriginForm("/hello.txt"));
+        request.setBody("foo");
         assertThat(request.getMethod(), equalTo(method));
     }
 
@@ -43,7 +44,8 @@ public class RequestTest {
     @Test
     @UseDataProvider("dataProviderRequestTargets")
     public void itShouldAllowGettingTheRequestTarget(RequestTarget requestTarget) {
-        Request request = new Request("GET", requestTarget, HashMap.empty(), "foo");
+        Request request = new Request("GET", requestTarget);
+        request.setBody("foo");
         assertThat(request.getRequestTarget(), equalTo(requestTarget));
     }
 
@@ -61,33 +63,38 @@ public class RequestTest {
     @Test
     @UseDataProvider("dataProviderHeaders")
     public void itShouldAllowGettingTheMethod(HashMap<String, String>  headers, Option expected) {
-        Request request = new Request("GET", new OriginForm("/hello.txt"), headers, "foo");
+        Request request = new Request("GET", new OriginForm("/hello.txt"));
+        headers.forEach(request::setHeader);
+        request.setBody("foo");
         assertThat(request.getHeader("Content-Length"), equalTo(expected));
     }
 
     @Test
     public void itShouldAllowSettingHeaders() {
-        Request request = new Request("GET", new OriginForm("/hello.txt"), HashMap.empty(), "foo");
+        Request request = new Request("GET", new OriginForm("/hello.txt"));
         request.setHeader("Content-Length", "3");
+        request.setBody("foo");
         assertThat(request.getHeader("Content-Length"), equalTo(Option.of("3")));
     }
 
     @Test
     public void matchingHeadersShouldBeCaseInsensitive() {
-        Request request = new Request("GET", new OriginForm("/hello.txt"), HashMap.empty(), "foo");
+        Request request = new Request("GET", new OriginForm("/hello.txt"));
         request.setHeader("Content-Length", "3");
+        request.setBody("foo");
         assertThat(request.getHeader("content-length"), equalTo(Option.of("3")));
     }
 
     @Test
     public void itShouldAllowGettingTheBody() {
-        Request request = new Request("GET", new OriginForm("/hello.txt"), HashMap.empty(), "foo");
+        Request request = new Request("GET", new OriginForm("/hello.txt"));
+        request.setBody("foo");
         assertThat(request.getBody(), equalTo("foo"));
     }
 
     @Test
     public void itShouldAllowSettingTheBody() {
-        Request request = new Request("GET", new OriginForm("/hello.txt"), HashMap.empty(), "foo");
+        Request request = new Request("GET", new OriginForm("/hello.txt"));
         request.setBody("bar");
         assertThat(request.getBody(), equalTo("bar"));
     }

@@ -95,6 +95,11 @@ public class StatusCodeTest {
     }
 
     @Test
+    public void permanentRedirectShouldBe308() {
+        assertThat(StatusCode.PERMANENT_REDIRECT, equalTo(308));
+    }
+
+    @Test
     public void badRequestShouldBe400() {
         assertThat(StatusCode.BAD_REQUEST, equalTo(400));
     }
@@ -307,6 +312,11 @@ public class StatusCodeTest {
     @Test
     public void _307ShouldBeTemporaryRedirect() {
         assertThat(StatusCode.getMessage(StatusCode.TEMPORARY_REDIRECT), equalTo(Option.of("Temporary Redirect")));
+    }
+
+    @Test
+    public void _308ShouldBePermanentRedirect() {
+        assertThat(StatusCode.getMessage(StatusCode.PERMANENT_REDIRECT), equalTo(Option.of("Permanent Redirect")));
     }
 
     @Test

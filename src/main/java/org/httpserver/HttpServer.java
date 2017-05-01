@@ -5,15 +5,19 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 
+import javaslang.collection.List;
 import javaslang.collection.Map;
 
+import org.core.exception.UnauthorizedHttpException;
 import org.core.Application;
 import org.core.Response;
 import org.core.Request;
 import org.core.StatusCode;
 
+import org.httpserver.controller.CoffeePotController;
 import org.httpserver.controller.CookieController;
 import org.httpserver.controller.FileSystemController;
+import org.httpserver.controller.RedirectController;
 
 class HttpServer {
     public static void main(String[] args) throws IOException {
@@ -44,11 +48,8 @@ class HttpServer {
 
         app.post("/noop-form", (request) -> Response.create());
 
-        app.get("/redirect", (request) -> {
-            Response response = Response.create(StatusCode.FOUND);
-            response.setHeader("Location", "/");
-            return response;
-        });
+        RedirectController redirectController = new RedirectController();
+        app.get("/redirect", (request) -> redirectController.redirect(request, "/"));
 
         app.get("/method_options", (request) -> Response.create());
         app.post("/method_options", (request) -> Response.create());
@@ -66,25 +67,19 @@ class HttpServer {
             return response;
         });
 
+        List<String> authorizedUsers = List.of("Basic YWRtaW46aHVudGVyMg==");
         app.get("/logs", (request) -> {
             String auth = request.getHeader("Authorization").getOrElse("");
-            if (auth.equals("Basic YWRtaW46aHVudGVyMg==")) {
-                return fileSystemController.get(request);
-            } else {
-                Response response = Response.create(StatusCode.UNAUTHORIZED);
-                response.setHeader("WWW-Authenticate", "Basic realm-\"httpserver-logs\"");
-
-                return response;
+            if (!authorizedUsers.contains(auth)) {
+                throw new UnauthorizedHttpException("Basic realm-\"httpserver-logs\"");
             }
+
+            return fileSystemController.get(request);
         });
 
-        app.get("/tea", (request) -> Response.create());
-        app.get("/coffee", (request) -> {
-            Response response = Response.create(StatusCode.IM_A_TEAPOT);
-            response.setBody("I'm a teapot");
-
-            return response;
-        });
+        CoffeePotController coffeePotController = new CoffeePotController();
+        app.get("/tea", coffeePotController::tea);
+        app.get("/coffee", coffeePotController::coffee);
 
         CookieController cookieController = new CookieController();
         app.get("/cookie", cookieController::writeCookie);

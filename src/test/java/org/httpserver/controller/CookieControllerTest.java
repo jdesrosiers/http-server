@@ -24,7 +24,7 @@ public class CookieControllerTest {
     @Test
     public void itShouldSetACookie() {
         CookieController controller = new CookieController();
-        Request request = new Request("GET", new OriginForm("/cookie", "type=chocolate"), HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/cookie", "type=chocolate"));
         Response response = controller.writeCookie(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -35,7 +35,7 @@ public class CookieControllerTest {
     @Test
     public void itShouldNotSetACookieIfThereIsNoTypeQueryParam() {
         CookieController controller = new CookieController();
-        Request request = new Request("GET", new OriginForm("/cookie"), HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/cookie"));
         Response response = controller.writeCookie(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -46,7 +46,7 @@ public class CookieControllerTest {
     @Test
     public void itShouldUseACookie() {
         CookieController controller = new CookieController();
-        Request request = new Request("GET", new OriginForm("/eat_cookie"), HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/eat_cookie"));
         request.setHeader("Cookie", "type=chocolate");
         Response response = controller.useCookie(request);
 
@@ -57,7 +57,7 @@ public class CookieControllerTest {
     @Test
     public void itShouldUseDefaultIfThereIsNoTypeCookie() {
         CookieController controller = new CookieController();
-        Request request = new Request("GET", new OriginForm("/eat_cookie"), HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/eat_cookie"));
         request.setHeader("Cookie", "foo=bar");
         Response response = controller.useCookie(request);
 
@@ -68,7 +68,7 @@ public class CookieControllerTest {
     @Test
     public void itShouldUseDefaultIfThereIsNoCookieAtAll() {
         CookieController controller = new CookieController();
-        Request request = new Request("GET", new OriginForm("/eat_cookie"), HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/eat_cookie"));
         Response response = controller.useCookie(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));

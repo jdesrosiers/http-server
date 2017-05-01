@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import org.junit.Test;
 import org.junit.After;
+import static org.junit.Assert.fail;
 import org.junit.runner.RunWith;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -18,6 +19,9 @@ import javaslang.Tuple;
 import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
+import org.core.exception.NotFoundHttpException;
+import org.core.exception.PreconditionFailedHttpException;
+import org.core.exception.UnsupportedMediaTypeHttpException;
 import org.core.OriginForm;
 import org.core.Response;
 import org.core.Request;
@@ -30,7 +34,7 @@ public class FileSystemControllerTest {
     @Test
     public void itShouldGetAFileFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("GET", new OriginForm("/file1"), HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/file1"));
         Response response = controller.get(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -38,19 +42,17 @@ public class FileSystemControllerTest {
         assertThat(response.getBodyAsString(), equalTo("file1 contents"));
     }
 
-    @Test
+    @Test(expected=NotFoundHttpException.class)
     public void itShould404WhenGettingANonexistentFileFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("GET", new OriginForm("/foobar"), HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/foobar"));
         Response response = controller.get(request);
-
-        assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
     }
 
     @Test
     public void itShouldGetADirectoryListingFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("GET", new OriginForm("/"), HashMap.empty(), "");
+        Request request = new Request("GET", new OriginForm("/"));
         Response response = controller.index(request);
         String body = response.getBodyAsString();
 
@@ -65,7 +67,7 @@ public class FileSystemControllerTest {
         Files.copy(Paths.get("public/file1"), Paths.get("public/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("DELETE", new OriginForm("/foo"), HashMap.empty(), "");
+        Request request = new Request("DELETE", new OriginForm("/foo"));
         Response response = controller.delete(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -74,7 +76,8 @@ public class FileSystemControllerTest {
     @Test
     public void itShouldPutANewFileToTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("PUT", new OriginForm("/foo"), HashMap.empty(), "foo contents");
+        Request request = new Request("PUT", new OriginForm("/foo"));
+        request.setBody("foo contents");
         Response response = controller.write(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.CREATED));
@@ -86,7 +89,8 @@ public class FileSystemControllerTest {
         Files.copy(Paths.get("public/file1"), Paths.get("public/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        Request request = new Request("PUT", new OriginForm("/foo"), HashMap.empty(), "foo contents");
+        Request request = new Request("PUT", new OriginForm("/foo"));
+        request.setBody("foo contents");
         Response response = controller.write(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -98,22 +102,21 @@ public class FileSystemControllerTest {
         Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        HashMap<String, String> requestHeaders = HashMap.ofEntries(
-            Tuple.of("Content-Type", "text/plain; charset=utf-8")
-        );
-        Request request = new Request("PATCH", new OriginForm("/foo"), requestHeaders, "foo contents");
-        Response response = controller.patch(request);
+        Request request = new Request("PATCH", new OriginForm("/foo"));
+        request.setBody("foo contents");
+        request.setHeader("Content-Type", "text/plain; charset=utf-8");
 
-        assertThat(response.getStatusCode(), equalTo(StatusCode.UNSUPPORTED_MEDIA_TYPE));
-        assertThat(response.getHeader("Accept-Patch"), equalTo(Option.of("application/unix-diff")));
+        try {
+            Response response = controller.patch(request);
+            fail();
+        } catch (UnsupportedMediaTypeHttpException he) {
+            assertThat(he.getHeader("Accept-Patch"), equalTo(Option.of("application/unix-diff")));
+        }
     }
 
-    @Test
+    @Test(expected=NotFoundHttpException.class)
     public void itShould404OnAPatchRequestToANonexistentResource() throws IOException, InterruptedException {
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        HashMap<String, String> requestHeaders = HashMap.ofEntries(
-            Tuple.of("Content-Type", "application/unix-diff")
-        );
 
         StringBuilder patch = new StringBuilder();
         patch.append("1c1\n");
@@ -123,21 +126,19 @@ public class FileSystemControllerTest {
         patch.append("> foo content\n");
         patch.append("\\ No newline at end of file\n");
 
-        Request request = new Request("PATCH", new OriginForm("/foo"), requestHeaders, patch.toString());
+        Request request = new Request("PATCH", new OriginForm("/foo"));
+        request.setHeader("Content-Type", "application/unix-diff");
+        request.setBody(patch.toString());
         Response response = controller.patch(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
     }
 
-    @Test
+    @Test(expected=PreconditionFailedHttpException.class)
     public void itShould412WhenTryingToPatchAndEtagsDontMatch() throws IOException, InterruptedException {
         Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        HashMap<String, String> requestHeaders = HashMap.ofEntries(
-            Tuple.of("Content-Type", "application/unix-diff"),
-            Tuple.of("If-Match", "xxx")
-        );
 
         StringBuilder patch = new StringBuilder();
         patch.append("1c1\n");
@@ -147,10 +148,11 @@ public class FileSystemControllerTest {
         patch.append("> foo content\n");
         patch.append("\\ No newline at end of file\n");
 
-        Request request = new Request("PATCH", new OriginForm("/foo"), requestHeaders, patch.toString());
+        Request request = new Request("PATCH", new OriginForm("/foo"));
+        request.setHeader("Content-Type", "application/unix-diff");
+        request.setHeader("If-Match", "xxx");
+        request.setBody(patch.toString());
         Response response = controller.patch(request);
-
-        assertThat(response.getStatusCode(), equalTo(StatusCode.PRECONDITION_FAILED));
     }
 
     @Test
@@ -158,10 +160,6 @@ public class FileSystemControllerTest {
         Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("public"));
-        HashMap<String, String> requestHeaders = HashMap.ofEntries(
-            Tuple.of("Content-Type", "application/unix-diff"),
-            Tuple.of("If-Match", "dc50a0d27dda2eee9f65644cd7e4c9cf11de8bec")
-        );
 
         StringBuilder patch = new StringBuilder();
         patch.append("1c1\n");
@@ -171,7 +169,10 @@ public class FileSystemControllerTest {
         patch.append("> foo content\n");
         patch.append("\\ No newline at end of file\n");
 
-        Request request = new Request("PATCH", new OriginForm("/foo"), requestHeaders, patch.toString());
+        Request request = new Request("PATCH", new OriginForm("/foo"));
+        request.setHeader("Content-Type", "application/unix-diff");
+        request.setHeader("If-Match", "dc50a0d27dda2eee9f65644cd7e4c9cf11de8bec");
+        request.setBody(patch.toString());
         Response response = controller.patch(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NO_CONTENT));

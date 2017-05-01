@@ -49,7 +49,7 @@ public class Http {
     public static final Parser<String> method = token;
     public static final Parser<Request> requestLine = Parsers.sequence(
             method, sp, requestTarget, sp, HTTPVersion, crlf,
-            (m, _2, t, _3, _4, _5) -> new Request(m, t, HashMap.empty(), "")
+            (m, _2, t, _3, _4, _5) -> new Request(m, t)
         );
     public static final Parser<String> fieldName = token;
     public static final Parser<String> fieldContent = Patterns.sequence(
