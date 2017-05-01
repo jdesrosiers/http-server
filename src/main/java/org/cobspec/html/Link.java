@@ -1,4 +1,4 @@
-package org.httpserver.html;
+package org.cobspec.html;
 
 public class Link {
     private String href;

@@ -1,4 +1,4 @@
-package org.httpserver;
+package org.cobspec;
 
 import org.jparsec.pattern.Patterns;
 import org.jparsec.Parser;

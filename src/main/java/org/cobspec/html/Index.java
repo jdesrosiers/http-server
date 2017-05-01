@@ -1,4 +1,4 @@
-package org.httpserver.html;
+package org.cobspec.html;
 
 import javaslang.collection.List;
 

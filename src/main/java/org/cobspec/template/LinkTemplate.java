@@ -1,6 +1,6 @@
-package org.httpserver.template;
+package org.cobspec.template;
 
-import org.httpserver.html.Link;
+import org.cobspec.html.Link;
 
 public class LinkTemplate {
     private static String template = "<li><a href=\"/%s\">%s</a></li>";

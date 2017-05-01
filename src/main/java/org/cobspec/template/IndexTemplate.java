@@ -1,8 +1,8 @@
-package org.httpserver.template;
+package org.cobspec.template;
 
 import javaslang.collection.List;
 
-import org.httpserver.html.Index;
+import org.cobspec.html.Index;
 
 public class IndexTemplate {
     public static String render(Index index) {

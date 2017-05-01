@@ -1,4 +1,4 @@
-package org.httpserver;
+package org.cobspec;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,12 +14,12 @@ import org.flint.Response;
 import org.flint.Request;
 import org.flint.StatusCode;
 
-import org.httpserver.controller.CoffeePotController;
-import org.httpserver.controller.CookieController;
-import org.httpserver.controller.FileSystemController;
-import org.httpserver.controller.RedirectController;
+import org.cobspec.controller.CoffeePotController;
+import org.cobspec.controller.CookieController;
+import org.cobspec.controller.FileSystemController;
+import org.cobspec.controller.RedirectController;
 
-class HttpServer {
+class CobSpec {
     public static void main(String[] args) throws IOException {
         Application app = new Application();
 
@@ -71,7 +71,7 @@ class HttpServer {
         app.get("/logs", (request) -> {
             String auth = request.getHeader("Authorization").getOrElse("");
             if (!authorizedUsers.contains(auth)) {
-                throw new UnauthorizedHttpException("Basic realm-\"httpserver-logs\"");
+                throw new UnauthorizedHttpException("Basic realm-\"cobspec-logs\"");
             }
 
             return fileSystemController.get(request);

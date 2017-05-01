@@ -31,7 +31,7 @@ dependencies {
 }
 
 // Define the main class for the application
-mainClassName = 'org.httpserver.HttpServer'
+mainClassName = 'org.cobspec.CobSpec'
 
 run {
     if (project.hasProperty("appArgs")) {

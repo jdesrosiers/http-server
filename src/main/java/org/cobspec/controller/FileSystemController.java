@@ -1,4 +1,4 @@
-package org.httpserver.controller;
+package org.cobspec.controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 import javaslang.control.Option;
 import javaslang.collection.List;
 
-import org.httpserver.html.Index;
-import org.httpserver.html.Link;
-import org.httpserver.template.IndexTemplate;
+import org.cobspec.html.Index;
+import org.cobspec.html.Link;
+import org.cobspec.template.IndexTemplate;
 import org.flint.exception.HttpException;
 import org.flint.exception.NotFoundHttpException;
 import org.flint.exception.PreconditionFailedHttpException;

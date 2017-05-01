@@ -1,4 +1,4 @@
-package org.httpserver.controller;
+package org.cobspec.controller;
 
 import org.flint.Cookie;
 import org.flint.FormUrlencoded;

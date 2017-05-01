@@ -1,4 +1,4 @@
-package org.httpserver;
+package org.cobspec;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
