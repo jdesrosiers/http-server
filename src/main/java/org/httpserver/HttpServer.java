@@ -8,11 +8,11 @@ import java.nio.file.Path;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 
-import org.core.exception.UnauthorizedHttpException;
-import org.core.Application;
-import org.core.Response;
-import org.core.Request;
-import org.core.StatusCode;
+import org.flint.exception.UnauthorizedHttpException;
+import org.flint.Application;
+import org.flint.Response;
+import org.flint.Request;
+import org.flint.StatusCode;
 
 import org.httpserver.controller.CoffeePotController;
 import org.httpserver.controller.CookieController;

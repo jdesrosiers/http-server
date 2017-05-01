@@ -1,8 +1,8 @@
 package org.httpserver.controller;
 
-import org.core.Response;
-import org.core.Request;
-import org.core.StatusCode;
+import org.flint.Response;
+import org.flint.Request;
+import org.flint.StatusCode;
 
 public class RedirectController {
     public Response redirect(Request request, String location) {

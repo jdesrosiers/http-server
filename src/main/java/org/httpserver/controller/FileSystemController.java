@@ -16,15 +16,15 @@ import javaslang.collection.List;
 import org.httpserver.html.Index;
 import org.httpserver.html.Link;
 import org.httpserver.template.IndexTemplate;
-import org.core.exception.HttpException;
-import org.core.exception.NotFoundHttpException;
-import org.core.exception.PreconditionFailedHttpException;
-import org.core.exception.UnsupportedMediaTypeHttpException;
-import org.core.MediaType;
-import org.core.Response;
-import org.core.Request;
-import org.core.UnixPatch;
-import org.core.StatusCode;
+import org.flint.exception.HttpException;
+import org.flint.exception.NotFoundHttpException;
+import org.flint.exception.PreconditionFailedHttpException;
+import org.flint.exception.UnsupportedMediaTypeHttpException;
+import org.flint.MediaType;
+import org.flint.Response;
+import org.flint.Request;
+import org.flint.UnixPatch;
+import org.flint.StatusCode;
 import org.util.FileSystem;
 
 public class FileSystemController {

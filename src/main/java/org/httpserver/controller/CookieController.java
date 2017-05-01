@@ -1,10 +1,10 @@
 package org.httpserver.controller;
 
-import org.core.Cookie;
-import org.core.FormUrlencoded;
-import org.core.Request;
-import org.core.Response;
-import org.core.StatusCode;
+import org.flint.Cookie;
+import org.flint.FormUrlencoded;
+import org.flint.Request;
+import org.flint.Response;
+import org.flint.StatusCode;
 
 public class CookieController {
     public Response writeCookie(Request request) {

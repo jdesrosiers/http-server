@@ -12,10 +12,10 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 import javaslang.control.Option;
 
-import org.core.OriginForm;
-import org.core.Response;
-import org.core.Request;
-import org.core.StatusCode;
+import org.flint.OriginForm;
+import org.flint.Response;
+import org.flint.Request;
+import org.flint.StatusCode;
 
 @RunWith(DataProviderRunner.class)
 public class RedirectControllerTest {
