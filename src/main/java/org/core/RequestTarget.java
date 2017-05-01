@@ -1,6 +1,8 @@
 package org.core;
 
+import javaslang.control.Option;
+
 public interface RequestTarget {
     public String getPath();
-    public String getQuery();
+    public Option<String> getQuery();
 }

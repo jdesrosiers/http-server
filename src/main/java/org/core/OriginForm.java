@@ -1,5 +1,7 @@
 package org.core;
 
+import javaslang.control.Option;
+
 public class OriginForm implements RequestTarget {
     private String path;
     private String query;
@@ -19,8 +21,8 @@ public class OriginForm implements RequestTarget {
     }
 
     @Override
-    public String getQuery() {
-        return query;
+    public Option<String> getQuery() {
+        return Option.of(query);
     }
 
     @Override

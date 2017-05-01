@@ -26,6 +26,10 @@ public class Request {
         return requestTarget;
     }
 
+    public Option<FormUrlencoded> getQuery() {
+        return requestTarget.getQuery().map(FormUrlencoded::new);
+    }
+
     public Option<String> getHeader(String name) {
         return headers.get(name.toLowerCase());
     }

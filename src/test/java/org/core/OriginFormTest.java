@@ -25,7 +25,7 @@ public class OriginFormTest {
     @Test
     public void itShouldHaveAQueryPart() {
         OriginForm originForm = new OriginForm("/", "foo=bar");
-        assertThat(originForm.getQuery(), equalTo("foo=bar"));
+        assertThat(originForm.getQuery(), equalTo(Option.of("foo=bar")));
     }
 
 }

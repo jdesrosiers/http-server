@@ -68,7 +68,7 @@ public class HttpParserTest {
     public void itShouldParseRequestTarget(String subject, String path, String query) {
         RequestTarget requestTarget = Http.requestTarget.parse(subject);
         assertThat(requestTarget.getPath(), equalTo(path));
-        assertThat(requestTarget.getQuery(), equalTo(query));
+        assertThat(requestTarget.getQuery(), equalTo(Option.of(query)));
     }
 
     @DataProvider
