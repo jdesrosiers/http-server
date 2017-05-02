@@ -21,11 +21,11 @@ import org.cobspec.controller.RedirectController;
 
 class CobSpec {
     public static void main(String[] args) throws IOException {
-        Application app = new Application();
-
         Map<String, String> arguments = Arguments.PARSER.parse(String.join(" ", args));
         int port = Integer.valueOf(arguments.get("p").getOrElse("5000"));
         String directory = arguments.get("d").getOrElse("public");
+
+        Application app = new Application();
 
         FileSystemController fileSystemController = new FileSystemController(Paths.get(directory));
 
@@ -71,7 +71,7 @@ class CobSpec {
         app.get("/logs", (request) -> {
             String auth = request.getHeader("Authorization").getOrElse("");
             if (!authorizedUsers.contains(auth)) {
-                throw new UnauthorizedHttpException("Basic realm-\"cobspec-logs\"");
+                throw new UnauthorizedHttpException("Basic realm=\"cobspec-logs\"");
             }
 
             return fileSystemController.get(request);

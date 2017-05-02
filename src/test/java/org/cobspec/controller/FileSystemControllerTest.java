@@ -33,7 +33,7 @@ public class FileSystemControllerTest {
 
     @Test
     public void itShouldGetAFileFromTheFileSystem() throws IOException {
-        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
         Request request = new Request("GET", new OriginForm("/file1"));
         Response response = controller.get(request);
 
@@ -44,14 +44,14 @@ public class FileSystemControllerTest {
 
     @Test(expected=NotFoundHttpException.class)
     public void itShould404WhenGettingANonexistentFileFromTheFileSystem() throws IOException {
-        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
         Request request = new Request("GET", new OriginForm("/foobar"));
         Response response = controller.get(request);
     }
 
     @Test
     public void itShouldGetADirectoryListingFromTheFileSystem() throws IOException {
-        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
         Request request = new Request("GET", new OriginForm("/"));
         Response response = controller.index(request);
         String body = response.getBodyAsString();
@@ -64,9 +64,9 @@ public class FileSystemControllerTest {
 
     @Test
     public void itShouldDeleteAFileFromTheFileSystem() throws IOException {
-        Files.copy(Paths.get("public/file1"), Paths.get("public/foo"));
+        Files.copy(Paths.get("src/test/resources/file1"), Paths.get("src/test/resources/foo"));
 
-        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
         Request request = new Request("DELETE", new OriginForm("/foo"));
         Response response = controller.delete(request);
 
@@ -75,33 +75,33 @@ public class FileSystemControllerTest {
 
     @Test
     public void itShouldPutANewFileToTheFileSystem() throws IOException {
-        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
         Request request = new Request("PUT", new OriginForm("/foo"));
         request.setBody("foo contents");
         Response response = controller.write(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.CREATED));
-        assertThat(FileSystem.fileToString(Paths.get("public/foo")), equalTo("foo contents"));
+        assertThat(FileSystem.fileToString(Paths.get("src/test/resources/foo")), equalTo("foo contents"));
     }
 
     @Test
     public void itShouldPutAnExistingFileToTheFileSystem() throws IOException {
-        Files.copy(Paths.get("public/file1"), Paths.get("public/foo"));
+        Files.copy(Paths.get("src/test/resources/file1"), Paths.get("src/test/resources/foo"));
 
-        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
         Request request = new Request("PUT", new OriginForm("/foo"));
         request.setBody("foo contents");
         Response response = controller.write(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(FileSystem.fileToString(Paths.get("public/foo")), equalTo("foo contents"));
+        assertThat(FileSystem.fileToString(Paths.get("src/test/resources/foo")), equalTo("foo contents"));
     }
 
     @Test
     public void itShouldOnlyAcceptPatchRequestsInUnixDiffFormat() throws IOException, InterruptedException {
-        Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
+        Files.copy(Paths.get("src/test/resources/patch-content.txt"), Paths.get("src/test/resources/foo"));
 
-        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
         Request request = new Request("PATCH", new OriginForm("/foo"));
         request.setBody("foo contents");
         request.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -116,7 +116,7 @@ public class FileSystemControllerTest {
 
     @Test(expected=NotFoundHttpException.class)
     public void itShould404OnAPatchRequestToANonexistentResource() throws IOException, InterruptedException {
-        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
 
         StringBuilder patch = new StringBuilder();
         patch.append("1c1\n");
@@ -136,9 +136,9 @@ public class FileSystemControllerTest {
 
     @Test(expected=PreconditionFailedHttpException.class)
     public void itShould412WhenTryingToPatchAndEtagsDontMatch() throws IOException, InterruptedException {
-        Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
+        Files.copy(Paths.get("src/test/resources/patch-content.txt"), Paths.get("src/test/resources/foo"));
 
-        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
 
         StringBuilder patch = new StringBuilder();
         patch.append("1c1\n");
@@ -157,9 +157,9 @@ public class FileSystemControllerTest {
 
     @Test
     public void itShouldPatchADocument() throws IOException, InterruptedException {
-        Files.copy(Paths.get("public/patch-content.txt"), Paths.get("public/foo"));
+        Files.copy(Paths.get("src/test/resources/patch-content.txt"), Paths.get("src/test/resources/foo"));
 
-        FileSystemController controller = new FileSystemController(Paths.get("public"));
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
 
         StringBuilder patch = new StringBuilder();
         patch.append("1c1\n");
@@ -176,12 +176,12 @@ public class FileSystemControllerTest {
         Response response = controller.patch(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NO_CONTENT));
-        assertThat(FileSystem.fileToString(Paths.get("public/foo")), equalTo("foo content"));
+        assertThat(FileSystem.fileToString(Paths.get("src/test/resources/foo")), equalTo("foo content"));
     }
 
     @After
     public void tearDown() throws IOException {
-        Files.deleteIfExists(Paths.get("public/foo"));
+        Files.deleteIfExists(Paths.get("src/test/resources/foo"));
     }
 
 }
