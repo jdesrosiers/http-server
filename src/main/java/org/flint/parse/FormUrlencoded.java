@@ -10,7 +10,7 @@ import org.jparsec.Parser;
 import org.jparsec.Parsers;
 import org.jparsec.Scanners;
 
-import static org.flint.parse.Abnf.*;
+import static org.flint.parse.Abnf.HEXDIG;
 
 // https://tools.ietf.org/html/draft-hoehrmann-urlencoded-01
 public class FormUrlencoded {

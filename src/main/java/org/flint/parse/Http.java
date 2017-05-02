@@ -14,8 +14,14 @@ import org.jparsec.Parser;
 import org.jparsec.Parsers;
 import org.jparsec.Scanners;
 
-import static org.flint.parse.Abnf.*;
-import static org.flint.parse.Uri.*;
+import static org.flint.parse.Abnf.ALPHA;
+import static org.flint.parse.Abnf.CRLF;
+import static org.flint.parse.Abnf.DIGIT;
+import static org.flint.parse.Abnf.HTAB;
+import static org.flint.parse.Abnf.SP;
+import static org.flint.parse.Abnf.VCHAR;
+import static org.flint.parse.Uri.segment;
+import static org.flint.parse.Uri.query;
 
 import org.flint.OriginForm;
 import org.flint.Request;

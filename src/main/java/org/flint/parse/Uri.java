@@ -4,7 +4,9 @@ import org.jparsec.pattern.Pattern;
 import org.jparsec.pattern.Patterns;
 import org.jparsec.Parser;
 
-import static org.flint.parse.Abnf.*;
+import static org.flint.parse.Abnf.ALPHA;
+import static org.flint.parse.Abnf.DIGIT;
+import static org.flint.parse.Abnf.HEXDIG;
 
 // RFC 3986
 public class Uri {

@@ -159,8 +159,8 @@ String fooCookie = cookie
 |  X  |     |     |  1  | Move Response writing out of `Application`.  `Server` is probably the right place, but I haven't decided for sure.
 |  X  |     |     |  1  | Refactor parsers for consistent style.  As I worked on these, the style I chose to use has evolved.  I need to go back and make them consistent.
 |     |     |  X  |  1  | Convert StatusCode tests to parameterized tests
-|     |  X  |     |  1  | Audit the code for `*` imports and clean up where necessary.
-|     |  X  |     |  1  | Audit the code for unused imports and clean up where necessary.
+|     |     |  X  |  1  | Audit the code for `*` imports and clean up where necessary.
+|     |     |  X  |  1  | Audit the code for unused imports and clean up where necessary.
 |     |  X  |     |  5  | Singe range partial content support.  It should ignore ranges it doesn't understand.  It should pass the ResponseTestSuite.PartialContent cob_spec test.
 |  X  |     |     |  2  | Decode URL encoded characters.  It should pass the ResponseTestSuite.ParameterDecode cob_spec test.
 

@@ -1,7 +1,8 @@
 package org.flint.parse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

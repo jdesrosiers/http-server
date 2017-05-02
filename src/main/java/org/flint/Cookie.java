@@ -3,7 +3,7 @@ package org.flint;
 import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
-import static org.flint.parse.Cookie.*;
+import static org.flint.parse.Cookie.PARSER;
 
 public class Cookie {
     private HashMap<String, String> cookie;

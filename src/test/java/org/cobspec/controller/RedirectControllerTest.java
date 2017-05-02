@@ -1,14 +1,9 @@
 package org.cobspec.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 
 import org.junit.Test;
-import org.junit.After;
-import org.junit.runner.RunWith;
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 import javaslang.control.Option;
 
@@ -17,7 +12,6 @@ import org.flint.Response;
 import org.flint.Request;
 import org.flint.StatusCode;
 
-@RunWith(DataProviderRunner.class)
 public class RedirectControllerTest {
 
     @Test
