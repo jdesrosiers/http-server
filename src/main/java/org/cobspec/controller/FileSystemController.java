@@ -42,7 +42,7 @@ public class FileSystemController {
         }
 
         Response response = Response.create();
-        String extension = FileSystem.getExtension(request.getRequestTarget().getPath());
+        String extension = FileSystem.getExtension(request.getPath());
         String contentType = MediaType.fromExtension(extension).getOrElse("application/octet-stream");
         response.setHeader("Content-Type", contentType);
         response.setBody(Files.newInputStream(targetPath));
@@ -65,7 +65,7 @@ public class FileSystemController {
                 return new Link(href, display);
             })
             .collect(Collectors.toList()));
-        Index index = new Index(request.getRequestTarget().getPath(), links);
+        Index index = new Index(request.getPath(), links);
 
         Response response = Response.create();
         response.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -81,7 +81,7 @@ public class FileSystemController {
 
     public Response write(Request request) throws IOException {
         ByteArrayInputStream body = new ByteArrayInputStream(request.getBody().getBytes());
-        return _write(request.getRequestTarget().getPath(), body);
+        return _write(request.getPath(), body);
     }
 
     public Response write(Request request, String location) throws IOException {
@@ -129,7 +129,7 @@ public class FileSystemController {
     }
 
     private Path getTargetPath(Request request) {
-        return rootPath.resolve("." + request.getRequestTarget().getPath()).normalize();
+        return rootPath.resolve("." + request.getPath()).normalize();
     }
 
     private Response _write(String target, InputStream body) throws IOException {
