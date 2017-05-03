@@ -20,60 +20,98 @@ import static org.flint.parse.Abnf.DIGIT;
 import static org.flint.parse.Abnf.HTAB;
 import static org.flint.parse.Abnf.SP;
 import static org.flint.parse.Abnf.VCHAR;
-import static org.flint.parse.Uri.segment;
-import static org.flint.parse.Uri.query;
+import static org.flint.parse.Uri.SEGMENT;
+import static org.flint.parse.Uri.QUERY;
 
 import org.flint.OriginForm;
 import org.flint.Request;
 import org.flint.RequestTarget;
 
 public class Http {
-    private static final Parser<Void> forwardSlash = Patterns.string("/").toScanner("/");
-    private static final Parser<Void> questionMark = Patterns.string("?").toScanner("?");
-    private static final Parser<Void> colon = Patterns.string(":").toScanner(":");
-    private static final Parser<Void> sp = SP.toScanner("SP");
-    private static final Parser<Void> crlf = CRLF.toScanner("CRLF");
+    public static final Parser<String> TCHAR = Parsers.or(
+            DIGIT,
+            ALPHA,
+            Scanners.among("!#$%'*+-.^_`|~")
+        ).label("obs-text").source();
 
-    public static final Pattern tchar = Patterns.or(DIGIT, ALPHA, Patterns.regex("[!#$%'*+\\-.^_`|~]"));
-    public static final Pattern obsText = Patterns.regex("[\\x80-\\xFF]");
-    public static final Pattern fieldVchar = Patterns.or(VCHAR, obsText);
+    public static final Parser<String> OBS_TEXT = Patterns.regex("[\\x80-\\xFF]")
+        .toScanner("obs-text").source();
 
-    public static final Parser<Void> OWS = Patterns.or(SP, HTAB).many().toScanner("OWS");
-    public static final Parser<String> token = tchar.many1().toScanner("token").source();
-    public static final Parser<Void> HTTPVersion = Scanners.string("HTTP/1.1", "HTTP-version");
-    public static final Parser<String> absolutePath = Parsers.sequence(forwardSlash, segment).many1().source();
-    public static final Parser<OriginForm> originForm = Parsers.sequence(
-            absolutePath,
+    public static final Parser<String> FIELD_VCHAR = Parsers.or(
+            VCHAR,
+            OBS_TEXT
+        ).label("field-vchar").source();
+
+    public static final Parser<String> OWS = Parsers.or(SP, HTAB).many().label("OWS").source();
+
+    public static final Parser<String> TOKEN = TCHAR.many1().label("token").source();
+
+    public static final Parser<Void> HTTP_VERSION = Scanners.string("HTTP/1.1", "HTTP-version");
+
+    public static final Parser<String> ABSOLUTE_PATH = Parsers.sequence(
+            Scanners.isChar('/'),
+            SEGMENT
+        ).many1()
+        .label("absolute-path").source();
+
+    public static final Parser<OriginForm> ORIGIN_FORM = Parsers.sequence(
+            ABSOLUTE_PATH,
             Parsers.sequence(
-                questionMark,
-                query,
+                Scanners.isChar('?'),
+                QUERY,
                 (_1, q) -> q
             ).optional(),
             (path, q) -> new OriginForm(path, q)
-        );
-    public static final Parser<RequestTarget> requestTarget = Parsers.or(originForm);
-    public static final Parser<String> method = token;
-    public static final Parser<Request> requestLine = Parsers.sequence(
-            method, sp, requestTarget, sp, HTTPVersion, crlf,
+        ).label("origin-form");
+
+    public static final Parser<RequestTarget> REQUEST_TARGET = Parsers.or(ORIGIN_FORM)
+        .label("request-target").cast();
+
+    public static final Parser<String> METHOD = TOKEN.label("method");
+
+    public static final Parser<Request> REQUEST_LINE = Parsers.sequence(
+            METHOD, SP, REQUEST_TARGET, SP, HTTP_VERSION, CRLF,
             (m, _2, t, _3, _4, _5) -> new Request(m, t)
-        );
-    public static final Parser<String> fieldName = token;
-    public static final Parser<String> fieldContent = Patterns.sequence(
-            fieldVchar,
-            Patterns.sequence(Patterns.or(SP, HTAB).many1(), fieldVchar).optional()
-        ).toScanner("field-content").source();
-    public static final Parser<Void> obsFold = Patterns.sequence(CRLF, Patterns.or(SP, HTAB).many1()).toScanner("obs-fold");
-    public static final Parser<String> fieldValue = Parsers.or(fieldContent, obsFold).many().source();
-    public static final Parser<Tuple2<String, String>> headerField = Parsers.sequence(fieldName, colon, OWS, fieldValue, OWS, (name, _colon, _ows, value, _ows2) -> Tuple.of(name, value));
+        ).label("request-line");
+
+    public static final Parser<String> FIELD_NAME = TOKEN.label("field-name");
+
+    public static final Parser<String> FIELD_CONTENT = Parsers.sequence(
+            FIELD_VCHAR,
+            Parsers.sequence(
+                Parsers.or(SP, HTAB).many1(),
+                FIELD_VCHAR
+            ).optional()
+        ).label("field-content").source();
+
+    public static final Parser<String> OBS_FOLD = Parsers.sequence(
+            CRLF,
+            Parsers.or(SP, HTAB).many1()
+        ).label("obs-fold").source();
+
+    public static final Parser<String> FIELD_VALUE = Parsers.or(
+            FIELD_CONTENT,
+            OBS_FOLD
+        ).many()
+        .label("field-value").source();
+
+    public static final Parser<Tuple2<String, String>> HEADER_FIELD = Parsers.sequence(
+            FIELD_NAME,
+            Scanners.isChar(':'),
+            OWS,
+            FIELD_VALUE,
+            OWS,
+            (name, _2, _3, value, _5) -> Tuple.of(name, value)
+        ).label("header-field");
 
     public static Request request(Reader reader) throws IOException {
         BufferedReader in = new BufferedReader(reader);
 
-        Request request = requestLine.parse(in.readLine() + "\r\n");
+        Request request = REQUEST_LINE.parse(in.readLine() + "\r\n");
 
         String line = in.readLine();
         while (line.length() > 0) {
-            Tuple2<String, String> header = headerField.parse(line);
+            Tuple2<String, String> header = HEADER_FIELD.parse(line);
             request.setHeader(header._1, header._2);
             line = in.readLine();
         }

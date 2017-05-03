@@ -1,8 +1,8 @@
 package org.flint.parse;
 
-import org.jparsec.pattern.Pattern;
-import org.jparsec.pattern.Patterns;
 import org.jparsec.Parser;
+import org.jparsec.Parsers;
+import org.jparsec.Scanners;
 
 import static org.flint.parse.Abnf.ALPHA;
 import static org.flint.parse.Abnf.DIGIT;
@@ -10,13 +10,35 @@ import static org.flint.parse.Abnf.HEXDIG;
 
 // RFC 3986
 public class Uri {
-    private static final Pattern forwardSlash = Patterns.string("/");
-    private static final Pattern questionMark = Patterns.string("?");
+    public static final Parser<String> UNRESERVED = Parsers.or(
+            DIGIT,
+            ALPHA,
+            Scanners.among("-._~")
+        ).label("unreserved").source();
 
-    public static final Pattern unreserved = Patterns.or(DIGIT, ALPHA, Patterns.regex("[\\-._~]"));
-    public static final Pattern subDelims = Patterns.regex("[!$&'()*+,;=]");
-    public static final Pattern pctEncoded = Patterns.sequence(Patterns.string("%"), HEXDIG, HEXDIG);
-    public static final Pattern pchar = Patterns.or(unreserved, pctEncoded, subDelims, Patterns.regex("[:@]"));
-    public static final Parser<String> segment = pchar.many().toScanner("segment").source();
-    public static final Parser<String> query = Patterns.or(pchar, forwardSlash, questionMark).many().toScanner("query").source();
+    public static final Parser<String> SUB_DELIMS = Scanners.among("!$&'()*+,;=")
+        .label("sub-delims").source();
+
+    public static final Parser<String> PCT_ENCODED = Parsers.sequence(
+            Scanners.isChar('%'),
+            HEXDIG,
+            HEXDIG
+        ).label("pct-encoded").source();
+
+    public static final Parser<String> PCHAR = Parsers.or(
+            UNRESERVED,
+            PCT_ENCODED,
+            SUB_DELIMS,
+            Scanners.among(":@")
+        ).label("pchar").source();
+
+    public static final Parser<String> SEGMENT = PCHAR.many()
+        .label("segment").source();
+
+    public static final Parser<String> QUERY = Parsers.or(
+            PCHAR,
+            Scanners.isChar('/'),
+            Scanners.isChar('?')
+        ).many()
+        .label("query").source();
 }
