@@ -156,7 +156,7 @@ String fooCookie = cookie
 |     |     |  X  |  1  | Rename the micro-framework from core to flint.
 |     |     |  X  |  1  | Rename HttpServer to CobSpec to clearly indicate that it is the implementation of cob_spec.
 |  X  |     |     |  2  | Move FileSystemControllerTest fixtures to test resources.  This should be trivial, but doing this in Java is always harder than it seems.
-|  X  |     |     |  1  | Move Response writing out of `Application`.  `Server` is probably the right place, but I haven't decided for sure.
+|     |     |  X  |  1  | Move Response writing out of `Application`.  `Server` is probably the right place, but I haven't decided for sure.
 |  X  |     |     |  1  | Refactor parsers for consistent style.  As I worked on these, the style I chose to use has evolved.  I need to go back and make them consistent.
 |  X  |     |     |  1  | Convert StatusCode tests to parameterized tests
 |     |  X  |     |  1  | Audit the code for `*` imports and clean up where necessary.

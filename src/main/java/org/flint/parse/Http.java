@@ -1,10 +1,5 @@
 package org.flint.parse;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-
-import javaslang.collection.HashMap;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 
@@ -59,26 +54,4 @@ public class Http {
     public static final Parser<Void> obsFold = Patterns.sequence(CRLF, Patterns.or(SP, HTAB).many1()).toScanner("obs-fold");
     public static final Parser<String> fieldValue = Parsers.or(fieldContent, obsFold).many().source();
     public static final Parser<Tuple2<String, String>> headerField = Parsers.sequence(fieldName, colon, OWS, fieldValue, OWS, (name, _colon, _ows, value, _ows2) -> Tuple.of(name, value));
-
-    public static Request request(Reader reader) throws IOException {
-        BufferedReader in = new BufferedReader(reader);
-
-        Request request = requestLine.parse(in.readLine() + "\r\n");
-
-        String line = in.readLine();
-        while (line.length() > 0) {
-            Tuple2<String, String> header = headerField.parse(line);
-            request.setHeader(header._1, header._2);
-            line = in.readLine();
-        }
-
-        int contentLength = Integer.parseInt(request.getHeader("Content-Length").getOrElse("0"));
-        if (contentLength > 0) {
-            char[] body = new char[contentLength];
-            in.read(body, 0, contentLength);
-            request.setBody(new String(body));
-        }
-
-        return request;
-    }
 }

@@ -1,81 +1,95 @@
 package org.flint;
 
-import javaslang.collection.List;
-import static javaslang.API.*;
-import static javaslang.Patterns.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-import org.flint.exception.HttpException;
+import javaslang.Function1;
+import javaslang.Tuple2;
+
+import org.jparsec.error.ParserException;
+
+import org.flint.parse.Http;
+import org.util.FileSystem;
 
 public class Server {
-    List<Route> routes;
+    private Function1<Request, Response> requestHandler;
 
-    public Server(List<Route> routes) {
-        this.routes = routes;
+    public Server(Function1<Request, Response> requestHandler) {
+        this.requestHandler = requestHandler;
     }
 
-    public Response handle(Request request) {
-        Response response;
-        List<Route> resourceMatches = routes.filter((route) -> isUriMatch(route, request));
+    public void run(int port) throws IOException {
+        try(ServerSocket listener = new ServerSocket(port)) {
+            System.out.println("Server running at http://localhost:" + port);
+            while (true) {
+                try(Socket socket = listener.accept()) {
+                    InputStreamReader reader = new InputStreamReader(socket.getInputStream());
+                    OutputStream os = socket.getOutputStream();
 
-        if (resourceMatches.isEmpty()) {
-            response = defaultResponse(StatusCode.NOT_FOUND);
-        } else {
-            List<Route> methodMatches = resourceMatches.filter((route) -> isMethodMatch(route, request));
-
-            if (methodMatches.isEmpty()) {
-                response = defaultResponse(StatusCode.METHOD_NOT_ALLOWED);
-                response.setHeader("Allow", buildAllowHeader(resourceMatches));
-            } else {
-                try {
-                    response = methodMatches.head().getController().apply(request);
-                } catch (HttpException he) {
-                    response = defaultResponse(he.getStatusCode());
-                    he.getHeaders().forEach(response::setHeader);
-                } catch (Throwable e) {
-                    response = defaultResponse(StatusCode.INTERNAL_SERVER_ERROR);
+                    handleHttpMessage(reader, os);
                 }
             }
         }
+    }
 
-        if (request.getMethod().equals("HEAD")) {
-            response.removeBody();
+    public void handleHttpMessage(Reader reader, OutputStream os) throws IOException {
+        try {
+            Request request = readRequest(reader);
+            Response response = requestHandler.apply(request);
+            writeResponse(response, os);
+        } catch (ParserException pe) {
+            Response response = Response.create(StatusCode.BAD_REQUEST);
+            writeResponse(response, os);
+        } catch (Throwable t) {
+            Response response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
+            writeResponse(response, os);
+        }
+    }
+
+    private Request readRequest(Reader reader) throws IOException {
+        BufferedReader in = new BufferedReader(reader);
+
+        Request request = Http.requestLine.parse(in.readLine() + "\r\n");
+
+        String line = in.readLine();
+        while (line.length() > 0) {
+            Tuple2<String, String> header = Http.headerField.parse(line);
+            request.setHeader(header._1, header._2);
+            line = in.readLine();
         }
 
-        return response;
+        int contentLength = Integer.parseInt(request.getHeader("Content-Length").getOrElse("0"));
+        if (contentLength > 0) {
+            char[] body = new char[contentLength];
+            in.read(body, 0, contentLength);
+            request.setBody(new String(body));
+        }
+
+        return request;
     }
 
-    private String buildAllowHeader(List<Route> matches) {
-        return matches
-            .map(Route::getMethod)
-            .reduce((a, b) -> a + "," + b);
-    }
+    private void writeResponse(Response response, OutputStream os) throws IOException {
+        PrintWriter out = new PrintWriter(os, true);
 
-    private boolean isUriMatch(Route route, Request request) {
-        return Match(route.getUriTemplate().match(request.getRequestTarget().getPath())).of(
-            Case(Some($()), true),
-            Case(None(), false)
-        );
-    }
+        int statusCode = response.getStatusCode();
+        String statusMessage = StatusCode.getMessage(statusCode).getOrElse("");
+        out.println(String.format("HTTP/1.1 %s %s\r", statusCode, statusMessage));
 
-    private boolean isMethodMatch(Route route, Request request) {
-        String routeMethod = route.getMethod();
-        String requestMethod = request.getMethod().equals("HEAD") ? "GET" : request.getMethod();
+        response.getHeaders()
+            .forEach((header, value) -> out.println(String.format("%s: %s\r", header, value)));
+        out.println("\r");
 
-        return routeMethod.equals(requestMethod);
-    }
-
-    private Response defaultResponse(int statusCode) {
-        Response response = Response.create(statusCode);
-        response.setHeader("Content-Type", "text/html; charset=utf-8");
-        response.setBody(defaultBody(response));
-
-        return response;
-    }
-
-    private String defaultBody(Response response) {
-        int status = response.getStatusCode();
-        String message = String.format("%s %s", status, StatusCode.getMessage(status).get());
-        String template = "<html><head><title>%s</title></head><body><h1>%s</h1></body></html>";
-        return String.format(template, message, message);
+        InputStream body = response.getBody();
+        if (body.available() > 0) {
+            FileSystem.copyStreams(body, os);
+            out.println("\r");
+        }
     }
 }

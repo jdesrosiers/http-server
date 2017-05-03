@@ -18,13 +18,13 @@ public class UriTemplateTest {
     @Test
     public void testSimpleMatch() {
         UriTemplate uriTemplate = new UriTemplate("/foo");
-        assertThat(uriTemplate.match("/foo"), equalTo(Option.of(HashMap.of())));
+        assertThat(uriTemplate.getMatchFor("/foo"), equalTo(Option.of(HashMap.of())));
     }
 
     @Test
     public void testSimpleFail() {
         UriTemplate uriTemplate = new UriTemplate("/foo");
-        assertThat(uriTemplate.match("/bar"), equalTo(Option.none()));
+        assertThat(uriTemplate.getMatchFor("/bar"), equalTo(Option.none()));
     }
 
 }

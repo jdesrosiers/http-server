@@ -26,6 +26,10 @@ public class Request {
         return requestTarget;
     }
 
+    public String getPath() {
+        return requestTarget.getPath();
+    }
+
     public Option<FormUrlencoded> getQuery() {
         return requestTarget.getQuery().map(FormUrlencoded::new);
     }
