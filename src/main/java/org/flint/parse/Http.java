@@ -1,10 +1,5 @@
 package org.flint.parse;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-
-import javaslang.collection.HashMap;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 
@@ -103,26 +98,4 @@ public class Http {
             OWS,
             (name, _2, _3, value, _5) -> Tuple.of(name, value)
         ).label("header-field");
-
-    public static Request request(Reader reader) throws IOException {
-        BufferedReader in = new BufferedReader(reader);
-
-        Request request = REQUEST_LINE.parse(in.readLine() + "\r\n");
-
-        String line = in.readLine();
-        while (line.length() > 0) {
-            Tuple2<String, String> header = HEADER_FIELD.parse(line);
-            request.setHeader(header._1, header._2);
-            line = in.readLine();
-        }
-
-        int contentLength = Integer.parseInt(request.getHeader("Content-Length").getOrElse("0"));
-        if (contentLength > 0) {
-            char[] body = new char[contentLength];
-            in.read(body, 0, contentLength);
-            request.setBody(new String(body));
-        }
-
-        return request;
-    }
 }

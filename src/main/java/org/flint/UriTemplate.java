@@ -11,7 +11,7 @@ public class UriTemplate {
         this.uriTemplate = uriTemplate;
     }
 
-    public Option<Map<String, String>> match(String uri) {
+    public Option<Map<String, String>> getMatchFor(String uri) {
         if (uri.equals(uriTemplate)) {
             Map<String, String> matches = HashMap.of();
             return Option.of(matches);

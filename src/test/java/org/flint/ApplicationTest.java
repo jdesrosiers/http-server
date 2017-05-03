@@ -23,10 +23,8 @@ public class ApplicationTest {
             return response;
         });
 
-        Server server = app.getServer();
-
         Request request = new Request("GET", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
@@ -44,10 +42,8 @@ public class ApplicationTest {
             return response;
         });
 
-        Server server = app.getServer();
-
         Request request = new Request("GET", new OriginForm("/foo", "bar"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
@@ -65,10 +61,8 @@ public class ApplicationTest {
             return response;
         });
 
-        Server server = app.getServer();
-
         Request request = new Request("HEAD", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
@@ -86,10 +80,8 @@ public class ApplicationTest {
             return response;
         });
 
-        Server server = app.getServer();
-
         Request request = new Request("POST", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
@@ -107,10 +99,8 @@ public class ApplicationTest {
             return response;
         });
 
-        Server server = app.getServer();
-
         Request request = new Request("PUT", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
@@ -128,10 +118,8 @@ public class ApplicationTest {
             return response;
         });
 
-        Server server = app.getServer();
-
         Request request = new Request("DELETE", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
@@ -150,10 +138,8 @@ public class ApplicationTest {
             return response;
         });
 
-        Server server = app.getServer();
-
         Request request = new Request("OPTIONS", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Allow"), equalTo(Option.of("GET,POST")));
@@ -172,10 +158,8 @@ public class ApplicationTest {
             return response;
         });
 
-        Server server = app.getServer();
-
         Request request = new Request("PATCH", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NO_CONTENT));
         assertThat(response.getHeader("ETag"), equalTo(Option.of("foo")));
@@ -187,10 +171,8 @@ public class ApplicationTest {
     public void itShould404WhenANonexistentResourceIsRequested() {
         Application app = new Application();
 
-        Server server = app.getServer();
-
         Request request = new Request("GET", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
         assertThat(response.getBodyAsString(), containsString("404 Not Found"));
@@ -200,10 +182,8 @@ public class ApplicationTest {
     public void itShould404WhenANonexistentResourceIsHeadRequested() {
         Application app = new Application();
 
-        Server server = app.getServer();
-
         Request request = new Request("HEAD", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
         assertThat(Integer.parseInt(response.getHeader("Content-Length").get()), greaterThan(0));
@@ -221,10 +201,8 @@ public class ApplicationTest {
             return response;
         });
 
-        Server server = app.getServer();
-
         Request request = new Request("GET", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));
         assertThat(response.getHeader("Allow"), equalTo(Option.of("POST")));
@@ -246,10 +224,8 @@ public class ApplicationTest {
             return Response.create();
         });
 
-        Server server = app.getServer();
-
         Request request = new Request("DELETE", new OriginForm("/foo"));
-        Response response = server.handle(request);
+        Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));
         assertThat(response.getHeader("Allow"), equalTo(Option.of("GET,POST")));
