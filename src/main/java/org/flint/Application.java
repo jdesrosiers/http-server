@@ -59,7 +59,7 @@ public class Application {
 
         try {
             LoggerMiddleware.logRequest(request);
-            response = routeMatcher.getMatchFor(request).getController().apply(request);
+            response = routeMatcher.applyController(request);
             response = rangeMiddleware.apply(request, response);
         } catch (HttpException he) {
             response = defaultResponse(he.getStatusCode());

@@ -5,12 +5,17 @@ import javaslang.collection.Queue;
 import org.flint.exception.NotFoundHttpException;
 import org.flint.exception.MethodNotAllowedHttpException;
 import org.flint.request.Request;
+import org.flint.response.Response;
 
 public class RouteMatcher {
     private Queue<Route> routes = Queue.empty();
 
     public void addRoute(Route route) {
         routes = routes.enqueue(route);
+    }
+
+    public Response applyController(Request request) throws Throwable {
+        return getMatchFor(request).getController().apply(request);
     }
 
     public Route getMatchFor(Request request) {
