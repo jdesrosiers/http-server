@@ -22,8 +22,8 @@ public class UnixPatchTest {
 
     @Test
     public void isShouldApplyAPatch() throws InterruptedException, IOException {
-        Path targetPath = Paths.get("public/foo.txt");
-        Files.copy(Paths.get("public/patch-content.txt"), targetPath);
+        Path targetPath = Paths.get("src/test/resources/foo.txt");
+        Files.copy(Paths.get("src/test/resources/patch-content.txt"), targetPath);
 
         StringBuilder patch = new StringBuilder();
         patch.append("1c1\n");
@@ -40,8 +40,8 @@ public class UnixPatchTest {
 
     @After
     public void tearDown() throws IOException {
-        Files.deleteIfExists(Paths.get("public/foo.txt.tmp.rej"));
-        Files.deleteIfExists(Paths.get("public/foo.txt.tmp"));
-        Files.deleteIfExists(Paths.get("public/foo.txt"));
+        Files.deleteIfExists(Paths.get("src/test/resources/foo.txt.tmp.rej"));
+        Files.deleteIfExists(Paths.get("src/test/resources/foo.txt.tmp"));
+        Files.deleteIfExists(Paths.get("src/test/resources/foo.txt"));
     }
 }

@@ -11,6 +11,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.stream.Collectors;
 
 import javaslang.control.Option;
+import javaslang.control.Try;
 import javaslang.collection.List;
 
 import org.cobspec.html.Index;
@@ -58,7 +59,7 @@ public class FileSystemController {
         }
 
         List<Link> links = List.ofAll(Files.walk(targetPath)
-            .filter(Files::isRegularFile)
+            .filter(path -> Try.of(() -> !Files.isHidden(path) && !Files.isSameFile(path, targetPath)).get())
             .map((filePath) -> {
                 String href = rootPath.relativize(filePath).toString();
                 String display = targetPath.relativize(filePath).toString();

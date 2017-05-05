@@ -21,11 +21,11 @@ import org.cobspec.controller.RedirectController;
 
 class CobSpec {
     public static void main(String[] args) throws IOException {
-        Application app = new Application();
-
         Map<String, String> arguments = Arguments.PARSER.parse(String.join(" ", args));
         int port = Integer.valueOf(arguments.get("p").getOrElse("5000"));
         String directory = arguments.get("d").getOrElse("public");
+
+        Application app = new Application();
 
         FileSystemController fileSystemController = new FileSystemController(Paths.get(directory));
 
@@ -53,7 +53,7 @@ class CobSpec {
 
         app.get("/method_options", (request) -> Response.create());
         app.post("/method_options", (request) -> Response.create());
-        app.put("/method_options", fileSystemController::write);
+        app.put("/method_options", (request) -> Response.create());
         app.options("/method_options", (request) -> {
             Response response = Response.create();
             response.setHeader("Allow", "GET,HEAD,POST,OPTIONS,PUT");
@@ -67,14 +67,15 @@ class CobSpec {
             return response;
         });
 
+        FileSystemController logsController = new FileSystemController(Paths.get("."));
         List<String> authorizedUsers = List.of("Basic YWRtaW46aHVudGVyMg==");
         app.get("/logs", (request) -> {
             String auth = request.getHeader("Authorization").getOrElse("");
             if (!authorizedUsers.contains(auth)) {
-                throw new UnauthorizedHttpException("Basic realm-\"cobspec-logs\"");
+                throw new UnauthorizedHttpException("Basic realm=\"cobspec-logs\"");
             }
 
-            return fileSystemController.get(request);
+            return logsController.get(request);
         });
 
         CoffeePotController coffeePotController = new CoffeePotController();
