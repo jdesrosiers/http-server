@@ -39,6 +39,13 @@ public class HttpException extends RuntimeException {
         this.headers = HashMap.empty();
     }
 
+    public HttpException(int statusCode, Throwable cause) {
+        super(cause);
+
+        this.statusCode = statusCode;
+        this.headers = HashMap.empty();
+    }
+
     public int getStatusCode() {
         return statusCode;
     }

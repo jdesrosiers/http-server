@@ -91,7 +91,7 @@ public class ResponseTest {
         Response response = Response.create();
         response.setBody("foo");
 
-        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
+        assertThat(response.getContentLength(), equalTo(3));
     }
 
 }

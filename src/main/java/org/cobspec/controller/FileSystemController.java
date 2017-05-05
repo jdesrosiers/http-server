@@ -38,9 +38,7 @@ public class FileSystemController {
     public Response get(Request request) throws IOException {
         Path targetPath = getTargetPath(request);
 
-        if (!Files.exists(targetPath)) {
-            throw new NotFoundHttpException();
-        }
+        ensureFileExists(targetPath);
 
         Response response = Response.create();
         String extension = FileSystem.getExtension(request.getPath());
@@ -54,9 +52,7 @@ public class FileSystemController {
     public Response index(Request request) throws IOException {
         Path targetPath = getTargetPath(request);
 
-        if (!Files.exists(targetPath)) {
-            throw new NotFoundHttpException();
-        }
+        ensureFileExists(targetPath);
 
         List<Link> links = List.ofAll(Files.walk(targetPath)
             .filter(path -> Try.of(() -> !Files.isHidden(path) && !Files.isSameFile(path, targetPath)).get())
@@ -96,9 +92,7 @@ public class FileSystemController {
     public Response patch(Request request) throws IOException, InterruptedException {
         Path targetPath = getTargetPath(request);
 
-        if (!Files.exists(targetPath)) {
-            throw new NotFoundHttpException();
-        }
+        ensureFileExists(targetPath);
 
         if (!isPatchTypeSupported(request.getHeader("Content-Type"))) {
             HttpException he = new UnsupportedMediaTypeHttpException();
@@ -118,6 +112,12 @@ public class FileSystemController {
             return response;
         } else {
             return Response.create(StatusCode.NO_CONTENT);
+        }
+    }
+
+    private void ensureFileExists(Path targetPath) {
+        if (!Files.exists(targetPath)) {
+            throw new NotFoundHttpException();
         }
     }
 

@@ -26,4 +26,10 @@ public class UnauthorizedHttpException extends HttpException {
 
         setHeader("WWW-Authenticate", challenge);
     }
+
+    public UnauthorizedHttpException(String challenge, Throwable cause) {
+        super(StatusCode.UNAUTHORIZED, cause);
+
+        setHeader("WWW-Authenticate", challenge);
+    }
 }

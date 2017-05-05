@@ -18,4 +18,8 @@ public class NotFoundHttpException extends HttpException {
     public NotFoundHttpException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(StatusCode.NOT_FOUND, message, cause, enableSuppression, writableStackTrace);
     }
+
+    public NotFoundHttpException(Throwable cause) {
+        super(StatusCode.NOT_FOUND, cause);
+    }
 }

@@ -74,6 +74,12 @@ public class Response {
         this.headers = headers.put(header, value);
     }
 
+    public int getContentLength() {
+        return getHeader("Content-Length")
+            .map(Integer::parseInt)
+            .get();
+    }
+
     public void setBody(String body) {
         setBody(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
     }

@@ -6,9 +6,11 @@ import javaslang.collection.Queue;
 import javaslang.CheckedFunction1;
 
 import org.flint.exception.HttpException;
+import org.flint.range.RangeMiddleware;
 
 public class Application {
     private RouteMatcher routeMatcher = new RouteMatcher();
+    private RangeMiddleware rangeMiddleware = new RangeMiddleware();
 
     public Route match(String method, String uriTemplate, CheckedFunction1<Request, Response> controller) {
         Route route = new Route(method, new UriTemplate(uriTemplate), controller);
@@ -53,6 +55,7 @@ public class Application {
         try {
             Logger.logRequest(request);
             response = routeMatcher.getMatchFor(request).getController().apply(request);
+            response = rangeMiddleware.apply(request, response);
         } catch (HttpException he) {
             response = defaultResponse(he.getStatusCode());
             he.getHeaders().forEach(response::setHeader);

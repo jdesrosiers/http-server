@@ -18,5 +18,8 @@ public class UnsupportedMediaTypeHttpException extends HttpException {
     public UnsupportedMediaTypeHttpException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(StatusCode.UNSUPPORTED_MEDIA_TYPE, message, cause, enableSuppression, writableStackTrace);
     }
-}
 
+    public UnsupportedMediaTypeHttpException(Throwable cause) {
+        super(StatusCode.UNSUPPORTED_MEDIA_TYPE, cause);
+    }
+}
