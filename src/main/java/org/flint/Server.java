@@ -5,6 +5,7 @@ import static javaslang.API.*;
 import static javaslang.Patterns.*;
 
 import org.flint.exception.HttpException;
+import org.flint.range.RangeMiddleware;
 
 public class Server {
     List<Route> routes;
@@ -28,6 +29,8 @@ public class Server {
             } else {
                 try {
                     response = methodMatches.head().getController().apply(request);
+                    RangeMiddleware range = new RangeMiddleware();
+                    response = range.apply(request, response);
                 } catch (HttpException he) {
                     response = defaultResponse(he.getStatusCode());
                     he.getHeaders().forEach(response::setHeader);
