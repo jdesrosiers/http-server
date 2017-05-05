@@ -1,4 +1,4 @@
-package org.flint.range;
+package org.flint;
 
 import java.io.IOException;
 
@@ -8,9 +8,10 @@ import javaslang.control.Try;
 
 import org.jparsec.error.ParserException;
 
-import org.flint.Request;
-import org.flint.Response;
-import org.flint.StatusCode;
+import org.flint.range.Range;
+import org.flint.request.Request;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 
 public class RangeMiddleware implements CheckedFunction2<Request, Response, Response> {
     public Response apply(Request request, Response response) {

@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import javaslang.control.Option;
 
-import org.flint.StatusCode;
+import org.flint.response.StatusCode;
 
 public class UnauthorizedHttpExceptionTest {
 

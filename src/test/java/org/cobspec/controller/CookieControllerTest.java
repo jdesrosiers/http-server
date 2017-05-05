@@ -9,10 +9,10 @@ import org.junit.Test;
 import javaslang.control.Option;
 import javaslang.collection.HashMap;
 
-import org.flint.OriginForm;
-import org.flint.Response;
-import org.flint.Request;
-import org.flint.StatusCode;
+import org.flint.request.OriginForm;
+import org.flint.request.Request;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 
 public class CookieControllerTest {
 

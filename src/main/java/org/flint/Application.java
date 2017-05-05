@@ -6,7 +6,12 @@ import javaslang.collection.Queue;
 import javaslang.CheckedFunction1;
 
 import org.flint.exception.HttpException;
-import org.flint.range.RangeMiddleware;
+import org.flint.request.Request;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
+import org.flint.routing.Route;
+import org.flint.routing.RouteMatcher;
+import org.flint.routing.UriTemplate;
 
 public class Application {
     private RouteMatcher routeMatcher = new RouteMatcher();
@@ -53,7 +58,7 @@ public class Application {
         Response response;
 
         try {
-            Logger.logRequest(request);
+            LoggerMiddleware.logRequest(request);
             response = routeMatcher.getMatchFor(request).getController().apply(request);
             response = rangeMiddleware.apply(request, response);
         } catch (HttpException he) {

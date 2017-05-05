@@ -1,4 +1,4 @@
-package org.flint;
+package org.flint.request;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

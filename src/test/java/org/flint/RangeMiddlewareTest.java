@@ -1,4 +1,4 @@
-package org.flint.range;
+package org.flint;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -13,10 +13,10 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 import javaslang.control.Option;
 
-import org.flint.OriginForm;
-import org.flint.Request;
-import org.flint.Response;
-import org.flint.StatusCode;
+import org.flint.request.OriginForm;
+import org.flint.request.Request;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 
 @RunWith(DataProviderRunner.class)
 public class RangeMiddlewareTest {

@@ -10,6 +10,11 @@ import org.junit.Test;
 import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
+import org.flint.request.OriginForm;
+import org.flint.request.Request;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
+
 public class ApplicationTest {
 
     @Test

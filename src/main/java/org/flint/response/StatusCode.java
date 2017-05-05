@@ -1,4 +1,4 @@
-package org.flint;
+package org.flint.response;
 
 import javaslang.collection.HashMap;
 import javaslang.collection.Map;

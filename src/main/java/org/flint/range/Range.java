@@ -5,7 +5,7 @@ import java.io.IOException;
 import javaslang.collection.List;
 
 import org.flint.parse.RangeRequests;
-import org.flint.Response;
+import org.flint.response.Response;
 
 public abstract class Range {
     public abstract Response makePartial(Response response) throws IOException;

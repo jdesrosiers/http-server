@@ -15,8 +15,8 @@ import javaslang.control.Option;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 
-import org.flint.Request;
-import org.flint.RequestTarget;
+import org.flint.request.Request;
+import org.flint.request.RequestTarget;
 
 @RunWith(DataProviderRunner.class)
 public class HttpParserTest {

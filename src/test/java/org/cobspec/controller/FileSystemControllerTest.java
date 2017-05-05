@@ -19,10 +19,10 @@ import javaslang.control.Option;
 import org.flint.exception.NotFoundHttpException;
 import org.flint.exception.PreconditionFailedHttpException;
 import org.flint.exception.UnsupportedMediaTypeHttpException;
-import org.flint.OriginForm;
-import org.flint.Response;
-import org.flint.Request;
-import org.flint.StatusCode;
+import org.flint.request.Request;
+import org.flint.request.OriginForm;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 import org.util.FileSystem;
 
 public class FileSystemControllerTest {

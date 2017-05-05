@@ -1,9 +1,10 @@
-package org.flint;
+package org.flint.routing;
 
 import javaslang.collection.Queue;
 
 import org.flint.exception.NotFoundHttpException;
 import org.flint.exception.MethodNotAllowedHttpException;
+import org.flint.request.Request;
 
 public class RouteMatcher {
     private Queue<Route> routes = Queue.empty();

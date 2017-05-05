@@ -1,9 +1,11 @@
-package org.flint;
+package org.flint.request;
 
 import javaslang.collection.HashMap;
 import javaslang.collection.Map;
 import javaslang.control.Option;
 import javaslang.Tuple;
+
+import org.flint.formurlencoded.FormUrlencoded;
 
 public class Request {
     private String method;

@@ -1,4 +1,4 @@
-package org.flint;
+package org.flint.unixpatch;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package org.flint;
+package org.flint.response;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

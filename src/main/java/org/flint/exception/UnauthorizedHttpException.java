@@ -1,6 +1,6 @@
 package org.flint.exception;
 
-import org.flint.StatusCode;
+import org.flint.response.StatusCode;
 
 public class UnauthorizedHttpException extends HttpException {
     public UnauthorizedHttpException(String challenge) {

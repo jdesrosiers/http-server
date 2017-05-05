@@ -9,10 +9,10 @@ import javaslang.collection.List;
 import javaslang.collection.Map;
 
 import org.flint.exception.UnauthorizedHttpException;
+import org.flint.request.Request;
 import org.flint.Application;
-import org.flint.Response;
-import org.flint.Request;
-import org.flint.StatusCode;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 
 import org.cobspec.controller.CoffeePotController;
 import org.cobspec.controller.CookieController;

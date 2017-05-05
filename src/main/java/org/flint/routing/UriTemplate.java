@@ -1,4 +1,4 @@
-package org.flint;
+package org.flint.routing;
 
 import javaslang.control.Option;
 import javaslang.collection.HashMap;

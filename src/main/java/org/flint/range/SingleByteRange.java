@@ -2,8 +2,8 @@ package org.flint.range;
 
 import java.io.IOException;
 
-import org.flint.Response;
-import org.flint.StatusCode;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 
 public abstract class SingleByteRange extends ByteRange {
     @Override

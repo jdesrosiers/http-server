@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.instanceOf;
 
 import org.junit.Test;
 
-import org.flint.StatusCode;
+import org.flint.response.StatusCode;
 
 public class UnsupportedMediaTypeHttpExceptionTest {
 

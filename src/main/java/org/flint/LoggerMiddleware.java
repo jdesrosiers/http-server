@@ -2,7 +2,10 @@ package org.flint;
 
 import java.time.LocalDateTime;
 
-public class Logger {
+import org.flint.request.Request;
+import org.flint.request.RequestTarget;
+
+public class LoggerMiddleware {
     public static Request logRequest(Request request) {
         LocalDateTime timestamp = LocalDateTime.now();
         String method = request.getMethod();
