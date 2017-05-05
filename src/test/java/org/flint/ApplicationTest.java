@@ -32,7 +32,7 @@ public class ApplicationTest {
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
+        assertThat(response.getContentLength(), equalTo(3));
         assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
@@ -53,7 +53,7 @@ public class ApplicationTest {
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
+        assertThat(response.getContentLength(), equalTo(3));
         assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
@@ -74,7 +74,7 @@ public class ApplicationTest {
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
+        assertThat(response.getContentLength(), equalTo(3));
         assertThat(response.getBodyAsString(), equalTo(""));
     }
 
@@ -95,7 +95,7 @@ public class ApplicationTest {
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
+        assertThat(response.getContentLength(), equalTo(3));
         assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
@@ -116,7 +116,7 @@ public class ApplicationTest {
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
+        assertThat(response.getContentLength(), equalTo(3));
         assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
@@ -137,7 +137,7 @@ public class ApplicationTest {
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
+        assertThat(response.getContentLength(), equalTo(3));
         assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
@@ -160,7 +160,7 @@ public class ApplicationTest {
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Allow"), equalTo(Option.of("GET,POST")));
-        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("3")));
+        assertThat(response.getContentLength(), equalTo(3));
         assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
@@ -182,7 +182,7 @@ public class ApplicationTest {
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NO_CONTENT));
         assertThat(response.getHeader("ETag"), equalTo(Option.of("foo")));
-        assertThat(response.getHeader("Content-Length"), equalTo(Option.of("0")));
+        assertThat(response.getContentLength(), equalTo(0));
         assertThat(response.getBodyAsString(), equalTo(""));
     }
 
@@ -209,7 +209,7 @@ public class ApplicationTest {
         Response response = server.handle(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
-        assertThat(Integer.parseInt(response.getHeader("Content-Length").get()), greaterThan(0));
+        assertThat(response.getContentLength(), greaterThan(0));
         assertThat(response.getBodyAsString(), equalTo(""));
     }
 

@@ -33,15 +33,15 @@ public class HttpExceptionTest {
     @Test
     public void itShouldAcceptHeaders() {
         HttpException he = new HttpException(StatusCode.NOT_FOUND);
-        he.setHeader("Content-Length", "3");
-        assertThat(he.getHeader("Content-Length"), equalTo(Option.of("3")));
+        he.setHeader("Content-Type", "image/png");
+        assertThat(he.getHeader("Content-Type"), equalTo(Option.of("image/png")));
     }
 
     @Test
     public void itShouldGiveAllHeaders() {
         HttpException he = new HttpException(StatusCode.NOT_FOUND);
-        he.setHeader("Content-Length", "3");
-        assertThat(he.getHeaders(), equalTo(HashMap.of("Content-Length", "3")));
+        he.setHeader("Content-Type", "image/png");
+        assertThat(he.getHeaders(), equalTo(HashMap.of("Content-Type", "image/png")));
     }
 
 }
