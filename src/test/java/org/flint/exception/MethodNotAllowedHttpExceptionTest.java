@@ -25,7 +25,7 @@ public class MethodNotAllowedHttpExceptionTest {
     }
 
     @Test
-    public void itShouldSetAWwwAuthenticateHeader() {
+    public void itShouldSetAllow() {
         MethodNotAllowedHttpException he = new MethodNotAllowedHttpException("GET,POST");
         assertThat(he.getHeader("Allow"), equalTo(Option.of("GET,POST")));
     }
