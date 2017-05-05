@@ -15,6 +15,7 @@ import javaslang.control.Option;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 
+import org.flint.request.Method;
 import org.flint.request.Request;
 import org.flint.request.RequestTarget;
 
@@ -26,7 +27,7 @@ public class HttpParserTest {
         Request request = Http.REQUEST_LINE.parse("GET /hello.txt HTTP/1.1\r\n");
 
         assertThat(request, instanceOf(Request.class));
-        assertThat(request.getMethod(), equalTo("GET"));
+        assertThat(request.getMethod(), equalTo(Method.GET));
         assertThat(request.getPath(), equalTo("/hello.txt"));
     }
 

@@ -6,6 +6,7 @@ import javaslang.collection.Queue;
 import javaslang.CheckedFunction1;
 
 import org.flint.exception.HttpException;
+import org.flint.request.Method;
 import org.flint.request.Request;
 import org.flint.response.Response;
 import org.flint.response.StatusCode;
@@ -25,27 +26,27 @@ public class Application {
     }
 
     public Route get(String uriTemplate, CheckedFunction1<Request, Response> controller) {
-        return match("GET", uriTemplate, controller);
+        return match(Method.GET, uriTemplate, controller);
     }
 
     public Route post(String uriTemplate, CheckedFunction1<Request, Response> controller) {
-        return match("POST", uriTemplate, controller);
+        return match(Method.POST, uriTemplate, controller);
     }
 
     public Route put(String uriTemplate, CheckedFunction1<Request, Response> controller) {
-        return match("PUT", uriTemplate, controller);
+        return match(Method.PUT, uriTemplate, controller);
     }
 
     public Route delete(String uriTemplate, CheckedFunction1<Request, Response> controller) {
-        return match("DELETE", uriTemplate, controller);
+        return match(Method.DELETE, uriTemplate, controller);
     }
 
     public Route options(String uriTemplate, CheckedFunction1<Request, Response> controller) {
-        return match("OPTIONS", uriTemplate, controller);
+        return match(Method.OPTIONS, uriTemplate, controller);
     }
 
     public Route patch(String uriTemplate, CheckedFunction1<Request, Response> controller) {
-        return match("PATCH", uriTemplate, controller);
+        return match(Method.PATCH, uriTemplate, controller);
     }
 
     public void run(int port) throws IOException {
@@ -68,7 +69,7 @@ public class Application {
             response = Response.create(StatusCode.INTERNAL_SERVER_ERROR);
         }
 
-        if (request.getMethod().equals("HEAD")) {
+        if (request.getMethod().equals(Method.HEAD)) {
             response.removeBody();
         }
 

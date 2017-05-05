@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import javaslang.control.Option;
 
+import org.flint.request.Method;
 import org.flint.request.Request;
 import org.flint.response.Response;
 import org.flint.response.StatusCode;
@@ -31,7 +32,7 @@ public class ServerTest {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         Server server = new Server(request -> {
-            assertThat(request.getMethod(), equalTo("GET"));
+            assertThat(request.getMethod(), equalTo(Method.GET));
             assertThat(request.getPath(), equalTo("/hello.txt"));
             assertThat(request.getHeader("Accept"), equalTo(Option.of("text/plain; charset=utf-8")));
 
@@ -53,7 +54,7 @@ public class ServerTest {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         Server server = new Server(request -> {
-            assertThat(request.getMethod(), equalTo("POST"));
+            assertThat(request.getMethod(), equalTo(Method.POST));
             assertThat(request.getPath(), equalTo("/form"));
             assertThat(request.getHeader("Content-Length"), equalTo(Option.of("20")));
             assertThat(request.getHeader("Content-Type"), equalTo(Option.of("application/json")));

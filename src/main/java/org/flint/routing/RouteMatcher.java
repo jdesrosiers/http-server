@@ -4,6 +4,7 @@ import javaslang.collection.Queue;
 
 import org.flint.exception.NotFoundHttpException;
 import org.flint.exception.MethodNotAllowedHttpException;
+import org.flint.request.Method;
 import org.flint.request.Request;
 import org.flint.response.Response;
 
@@ -44,7 +45,7 @@ public class RouteMatcher {
 
     private boolean isMethodMatch(Route route, Request request) {
         String routeMethod = route.getMethod();
-        String requestMethod = request.getMethod().equals("HEAD") ? "GET" : request.getMethod();
+        String requestMethod = request.getMethod().equals(Method.HEAD) ? Method.GET : request.getMethod();
 
         return routeMethod.equals(requestMethod);
     }

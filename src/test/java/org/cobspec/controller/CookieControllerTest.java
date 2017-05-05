@@ -10,6 +10,7 @@ import javaslang.control.Option;
 import javaslang.collection.HashMap;
 
 import org.flint.request.OriginForm;
+import org.flint.request.Method;
 import org.flint.request.Request;
 import org.flint.response.Response;
 import org.flint.response.StatusCode;
@@ -19,7 +20,7 @@ public class CookieControllerTest {
     @Test
     public void itShouldSetACookie() {
         CookieController controller = new CookieController();
-        Request request = new Request("GET", new OriginForm("/cookie", "type=chocolate"));
+        Request request = new Request(Method.GET, new OriginForm("/cookie", "type=chocolate"));
         Response response = controller.writeCookie(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -30,7 +31,7 @@ public class CookieControllerTest {
     @Test
     public void itShouldNotSetACookieIfThereIsNoTypeQueryParam() {
         CookieController controller = new CookieController();
-        Request request = new Request("GET", new OriginForm("/cookie"));
+        Request request = new Request(Method.GET, new OriginForm("/cookie"));
         Response response = controller.writeCookie(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -41,7 +42,7 @@ public class CookieControllerTest {
     @Test
     public void itShouldUseACookie() {
         CookieController controller = new CookieController();
-        Request request = new Request("GET", new OriginForm("/eat_cookie"));
+        Request request = new Request(Method.GET, new OriginForm("/eat_cookie"));
         request.setHeader("Cookie", "type=chocolate");
         Response response = controller.useCookie(request);
 
@@ -52,7 +53,7 @@ public class CookieControllerTest {
     @Test
     public void itShouldUseDefaultIfThereIsNoTypeCookie() {
         CookieController controller = new CookieController();
-        Request request = new Request("GET", new OriginForm("/eat_cookie"));
+        Request request = new Request(Method.GET, new OriginForm("/eat_cookie"));
         request.setHeader("Cookie", "foo=bar");
         Response response = controller.useCookie(request);
 
@@ -63,7 +64,7 @@ public class CookieControllerTest {
     @Test
     public void itShouldUseDefaultIfThereIsNoCookieAtAll() {
         CookieController controller = new CookieController();
-        Request request = new Request("GET", new OriginForm("/eat_cookie"));
+        Request request = new Request(Method.GET, new OriginForm("/eat_cookie"));
         Response response = controller.useCookie(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
