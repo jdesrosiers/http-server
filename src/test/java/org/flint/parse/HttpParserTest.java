@@ -1,7 +1,8 @@
 package org.flint.parse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +28,7 @@ public class HttpParserTest {
 
     @Test
     public void itShouldParseARequest() {
-        Request request = Http.requestLine.parse("GET /hello.txt HTTP/1.1\r\n");
+        Request request = Http.REQUEST_LINE.parse("GET /hello.txt HTTP/1.1\r\n");
 
         assertThat(request, instanceOf(Request.class));
         assertThat(request.getMethod(), equalTo("GET"));
@@ -47,7 +48,7 @@ public class HttpParserTest {
     @Test
     @UseDataProvider("dataProviderAbsolutePath")
     public void itShouldParseAbsolutePath(String subject) {
-        assertThat(Http.absolutePath.parse(subject), equalTo(subject));
+        assertThat(Http.ABSOLUTE_PATH.parse(subject), equalTo(subject));
     }
 
     @DataProvider
@@ -66,7 +67,7 @@ public class HttpParserTest {
     @Test
     @UseDataProvider("dataProviderRequestTarget")
     public void itShouldParseRequestTarget(String subject, String path, String query) {
-        RequestTarget requestTarget = Http.requestTarget.parse(subject);
+        RequestTarget requestTarget = Http.REQUEST_TARGET.parse(subject);
         assertThat(requestTarget.getPath(), equalTo(path));
         assertThat(requestTarget.getQuery(), equalTo(Option.of(query)));
     }
@@ -82,7 +83,7 @@ public class HttpParserTest {
     @Test
     @UseDataProvider("dataProviderHeaders")
     public void itShouldParseHeaders(String header, Tuple2<String, String> expected) {
-        assertThat(Http.headerField.parse(header), equalTo(expected));
+        assertThat(Http.HEADER_FIELD.parse(header), equalTo(expected));
     }
 
     @Test

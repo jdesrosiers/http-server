@@ -1,20 +1,15 @@
 package org.flint.exception;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 
 import org.junit.Test;
-import org.junit.After;
-import org.junit.runner.RunWith;
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 import javaslang.control.Option;
 
 import org.flint.StatusCode;
 
-@RunWith(DataProviderRunner.class)
 public class UnauthorizedHttpExceptionTest {
 
     @Test
@@ -31,7 +26,7 @@ public class UnauthorizedHttpExceptionTest {
 
     @Test
     public void itShouldSetAWwwAuthenticateHeader() {
-        UnauthorizedHttpException he = new UnauthorizedHttpException("Basic realm-\"foo\"");
-        assertThat(he.getHeader("WWW-Authenticate"), equalTo(Option.of("Basic realm-\"foo\"")));
+        UnauthorizedHttpException he = new UnauthorizedHttpException("Basic realm=\"foo\"");
+        assertThat(he.getHeader("WWW-Authenticate"), equalTo(Option.of("Basic realm=\"foo\"")));
     }
 }

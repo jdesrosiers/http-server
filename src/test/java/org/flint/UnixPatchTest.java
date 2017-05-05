@@ -1,14 +1,10 @@
 package org.flint;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 
 import org.junit.Test;
 import org.junit.After;
-import org.junit.runner.RunWith;
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,7 +13,6 @@ import java.nio.file.Paths;
 
 import org.util.FileSystem;
 
-@RunWith(DataProviderRunner.class)
 public class UnixPatchTest {
 
     @Test

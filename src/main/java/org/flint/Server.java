@@ -1,8 +1,6 @@
 package org.flint;
 
 import javaslang.collection.List;
-import static javaslang.API.*;
-import static javaslang.Patterns.*;
 
 import org.flint.exception.HttpException;
 
@@ -51,10 +49,7 @@ public class Server {
     }
 
     private boolean isUriMatch(Route route, Request request) {
-        return Match(route.getUriTemplate().match(request.getRequestTarget().getPath())).of(
-            Case(Some($()), true),
-            Case(None(), false)
-        );
+        return route.getUriTemplate().match(request.getRequestTarget().getPath()).isDefined();
     }
 
     private boolean isMethodMatch(Route route, Request request) {

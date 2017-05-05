@@ -1,15 +1,12 @@
 package org.cobspec.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
 
 import org.junit.Test;
 import org.junit.After;
 import static org.junit.Assert.fail;
-import org.junit.runner.RunWith;
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,7 +25,6 @@ import org.flint.Request;
 import org.flint.StatusCode;
 import org.util.FileSystem;
 
-@RunWith(DataProviderRunner.class)
 public class FileSystemControllerTest {
 
     @Test

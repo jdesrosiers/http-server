@@ -5,7 +5,7 @@ import javaslang.collection.HashMap;
 import javaslang.collection.Map;
 import javaslang.control.Option;
 
-import static org.flint.parse.FormUrlencoded.*;
+import static org.flint.parse.FormUrlencoded.PARSER;
 
 public class FormUrlencoded {
     private HashMap<String, String> values;
