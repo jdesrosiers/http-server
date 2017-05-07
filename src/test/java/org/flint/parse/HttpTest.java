@@ -19,7 +19,7 @@ import org.flint.Request;
 import org.flint.RequestTarget;
 
 @RunWith(DataProviderRunner.class)
-public class HttpParserTest {
+public class HttpTest {
 
     @Test
     public void itShouldParseARequest() {
@@ -55,7 +55,8 @@ public class HttpParserTest {
             { "/hello.txt?", "/hello.txt", "" },
             { "/hello.txt?foo", "/hello.txt", "foo" },
             { "/hello.txt?foo=bar", "/hello.txt", "foo=bar" },
-            { "/hello.txt?foo=bar&abc=123", "/hello.txt", "foo=bar&abc=123" }
+            { "/hello.txt?foo=bar&abc=123", "/hello.txt", "foo=bar&abc=123" },
+            { "/hello.txt?foo=abc%20123", "/hello.txt", "foo=abc%20123" }
         };
     }
 

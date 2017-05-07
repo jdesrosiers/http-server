@@ -17,6 +17,7 @@ import org.flint.StatusCode;
 import org.cobspec.controller.CoffeePotController;
 import org.cobspec.controller.CookieController;
 import org.cobspec.controller.FileSystemController;
+import org.cobspec.controller.ParameterDecodeController;
 import org.cobspec.controller.RedirectController;
 
 class CobSpec {
@@ -85,6 +86,9 @@ class CobSpec {
         CookieController cookieController = new CookieController();
         app.get("/cookie", cookieController::writeCookie);
         app.get("/eat_cookie", cookieController::useCookie);
+
+        ParameterDecodeController parameterDecodeController = new ParameterDecodeController();
+        app.get("/parameters", parameterDecodeController::run);
 
         app.run(port);
     }

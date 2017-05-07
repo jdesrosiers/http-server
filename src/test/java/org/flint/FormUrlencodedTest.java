@@ -35,26 +35,33 @@ public class FormUrlencodedTest {
     }
 
     @Test
-    public void itShouldContructValuesFromAString() {
+    public void itShouldConstructValuesFromAQueryString() {
         FormUrlencoded values = new FormUrlencoded("foo=bar");
         assertThat(values.get("foo"), equalTo(Option.of("bar")));
     }
 
+    @Test
+    public void itShouldDecodePecentEncodedValuesWhenConstructingValuesFromAQueryString() {
+        FormUrlencoded values = new FormUrlencoded("foo%20bar=abc%20123");
+        assertThat(values.get("foo bar"), equalTo(Option.of("abc 123")));
+    }
+
     @DataProvider
-    public static Object[][] dataProviderEncoded() {
+    public static Object[][] dataProviderQueryStrings() {
         return new Object[][] {
             { "" },
             { "foo=bar" },
             { "foo" },
-            { "abc=123&foo=bar" }
+            { "abc=123&foo=bar" },
+            { "abc%20123=foo%20bar" }
         };
     }
 
     @Test
-    @UseDataProvider("dataProviderEncoded")
+    @UseDataProvider("dataProviderQueryStrings")
     public void itShouldBeSerializableToAString(String subject) {
         FormUrlencoded values = new FormUrlencoded(subject);
-        assertThat(values.toString(), equalTo(subject));
+        assertThat(values.toQueryString(), equalTo(subject));
     }
 
 }

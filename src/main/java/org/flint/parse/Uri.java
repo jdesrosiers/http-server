@@ -1,5 +1,7 @@
 package org.flint.parse;
 
+import javaslang.collection.List;
+
 import org.jparsec.Parser;
 import org.jparsec.Parsers;
 import org.jparsec.Scanners;
@@ -21,9 +23,9 @@ public class Uri {
 
     public static final Parser<String> PCT_ENCODED = Parsers.sequence(
             Scanners.isChar('%'),
-            HEXDIG,
-            HEXDIG
-        ).label("pct-encoded").source();
+            Parsers.sequence(HEXDIG, HEXDIG).source(),
+            (_1, ascii) -> ascii
+        ).label("pct-encoded");
 
     public static final Parser<String> PCHAR = Parsers.or(
             UNRESERVED,
@@ -41,4 +43,24 @@ public class Uri {
             Scanners.isChar('?')
         ).many()
         .label("query").source();
+
+    public static final Parser<String> ENCODE = Parsers.or(
+            UNRESERVED.source(),
+            Scanners.ANY_CHAR.source().map(Uri::asciiToPercentEncoded)
+        ).many()
+        .map(chars -> List.ofAll(chars).fold("", String::concat));
+
+    public static final Parser<String> DECODE = Parsers.or(
+            PCT_ENCODED.map(Uri::hexToAscii),
+            Scanners.ANY_CHAR.source()
+        ).many()
+        .map(chars -> List.ofAll(chars).fold("", String::concat));
+
+    private static String hexToAscii(String hex) {
+        return Character.valueOf((char) Integer.parseInt(hex, 16)).toString();
+    }
+
+    private static String asciiToPercentEncoded(String ascii) {
+        return "%" + Integer.toHexString((int) ascii.charAt(0)).toUpperCase();
+    }
 }

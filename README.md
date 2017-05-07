@@ -162,7 +162,7 @@ String fooCookie = cookie
 |     |     |  X  |  1  | Audit the code for `*` imports and clean up where necessary.
 |     |     |  X  |  1  | Audit the code for unused imports and clean up where necessary.
 |     |     |  X  |  5  | Singe range partial content support.  It should ignore ranges it doesn't understand.  It should pass the ResponseTestSuite.PartialContent cob_spec test.
-|  X  |     |     |  2  | Decode URL encoded characters.  It should pass the ResponseTestSuite.ParameterDecode cob_spec test.
+|     |     |  X  |  2  | Decode URL encoded characters.  It should pass the ResponseTestSuite.ParameterDecode cob_spec test.
 
 **Legend:** *AV* => Available, *IP* => In Progress, *CP* => Completed, *SP* => Story Points
 

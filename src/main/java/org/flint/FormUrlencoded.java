@@ -1,11 +1,13 @@
 package org.flint;
 
 import javaslang.Tuple2;
+import javaslang.collection.List;
 import javaslang.collection.HashMap;
 import javaslang.collection.Map;
 import javaslang.control.Option;
 
 import static org.flint.parse.FormUrlencoded.PARSER;
+import org.flint.parse.Uri;
 
 public class FormUrlencoded {
     private HashMap<String, String> values;
@@ -34,17 +36,20 @@ public class FormUrlencoded {
         values = values.put(key, value);
     }
 
+    public List<Tuple2<String, String>> toList() {
+        return values.toList();
+    }
+
     private String entryToString(Tuple2<String, String> entry) {
-        String str = entry._1;
+        String str = Uri.ENCODE.parse(entry._1);
         if (entry._2 != null) {
-            str += "=" + entry._2;
+            str += "=" + Uri.ENCODE.parse(entry._2);
         }
 
         return str;
     }
 
-    @Override
-    public String toString() {
+    public String toQueryString() {
         return values
             .map(this::entryToString)
             .intersperse("&")
