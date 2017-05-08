@@ -72,11 +72,8 @@ public class Http {
     public static final Parser<String> FIELD_NAME = TOKEN.label("field-name");
 
     public static final Parser<String> FIELD_CONTENT = Parsers.sequence(
-            FIELD_VCHAR,
-            Parsers.sequence(
-                Parsers.or(SP, HTAB).many1(),
-                FIELD_VCHAR
-            ).optional()
+            Parsers.or(SP, HTAB).many(),
+            FIELD_VCHAR
         ).label("field-content").source();
 
     public static final Parser<String> OBS_FOLD = Parsers.sequence(
