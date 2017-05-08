@@ -6,6 +6,13 @@ This project has two main parts.  The first is an HTTP Server micro-framework ca
 # Development
 All code is written in Java 8 and uses the Gradle build tool
 
+## Build
+You can assemble the server into a jar using the following command.  The result can be found at `build/libs/http-server-all.jar`
+
+```
+> ./gradlew shadowJar
+```
+
 ## Test
 Tests use JUnit with the [junit-dataprovider](https://github.com/TNG/junit-dataprovider) test runner.  Tests can be run through gradle.
 
@@ -22,6 +29,12 @@ You can run the server with gradle
 > ./gradlew run
 ```
 
+Or, run the assembled jar
+
+```
+> java -jar build/libs/http-server-all.jar
+```
+
 ### Arguments
 The server takes two optional arguments `[-p PORT] [-d DIRECTORY]`.  Where `PORT` is the port the server will listen on and `DIRECTORY` is where many of the resources expected in cob_spec will be served from.  You can pass these arguments to the gradle `run` command with the `appArgs` argument.
 
@@ -31,6 +44,7 @@ The server takes two optional arguments `[-p PORT] [-d DIRECTORY]`.  Where `PORT
 
 ```
 > ./gradlew run -PappArgs="-p 5000 -d public"
+> java -jar build/libs/http-server-all.jar -p 5000 -d public"
 ```
 
 ### Logs
