@@ -7,6 +7,9 @@ import static org.hamcrest.Matchers.greaterThan;
 
 import org.junit.Test;
 
+import java.util.logging.Logger;
+import java.util.logging.Handler;
+
 import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
@@ -18,9 +21,21 @@ import org.flint.response.StatusCode;
 
 public class ApplicationTest {
 
+    private Logger logger;
+
+    public ApplicationTest() {
+        this.logger = Logger.getAnonymousLogger();
+
+        // Suppress default console output
+        Logger rootLogger = Logger.getLogger("");
+        for (Handler handler : rootLogger.getHandlers()) {
+            rootLogger.removeHandler(handler);
+        }
+    }
+
     @Test
     public void itShouldHandleASimpleGET() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -39,7 +54,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldMatchRoutesWithoutQueryParams() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -58,7 +73,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimpleHEAD() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -77,7 +92,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimplePOST() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.post("/foo", (request) -> {
             Response response = Response.create();
@@ -96,7 +111,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimplePUT() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.put("/foo", (request) -> {
             Response response = Response.create();
@@ -115,7 +130,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimpleDELETE() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.delete("/foo", (request) -> {
             Response response = Response.create();
@@ -134,7 +149,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimpleOPTIONS() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.options("/foo", (request) -> {
             Response response = Response.create();
@@ -155,7 +170,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimplePATCH() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.patch("/foo", (request) -> {
             Response response = Response.create(StatusCode.NO_CONTENT);
@@ -175,7 +190,7 @@ public class ApplicationTest {
 
     @Test
     public void itShould404WhenANonexistentResourceIsRequested() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         Request request = new Request(Method.GET, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
@@ -186,7 +201,7 @@ public class ApplicationTest {
 
     @Test
     public void itShould404WhenANonexistentResourceIsHeadRequested() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         Request request = new Request(Method.HEAD, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
@@ -198,7 +213,7 @@ public class ApplicationTest {
 
     @Test
     public void itShould405WhenResourceExistsButMethodIsNotAllowed() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.post("/foo", (request) -> {
             Response response = Response.create();
@@ -217,7 +232,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHaveAnAllowHeaderWithAllAllowedMethodsWhenResponseIs405() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.get("/foo", (request) -> {
             Response response = Response.create();

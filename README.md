@@ -22,19 +22,6 @@ You can run the server with gradle
 > ./gradlew run
 ```
 
-### Logs
-Logs are written to stdout.  Cob_spec expects to find logs in the /logs file.  You can have logs write to the log file from the command line.
-
-```
-> ./gradlew run > public/logs
-```
-
-Or, if you want to see the logs *and* write them to file you can use `tee`.
-
-```
-> ./gradlew run | tee public/logs
-```
-
 ### Arguments
 The server takes two optional arguments `[-p PORT] [-d DIRECTORY]`.  Where `PORT` is the port the server will listen on and `DIRECTORY` is where many of the resources expected in cob_spec will be served from.  You can pass these arguments to the gradle `run` command with the `appArgs` argument.
 
@@ -45,6 +32,9 @@ The server takes two optional arguments `[-p PORT] [-d DIRECTORY]`.  Where `PORT
 ```
 > ./gradlew run -PappArgs="-p 5000 -d public"
 ```
+
+### Logs
+Logs are written to stdout and a file at `./logs`.
 
 ## Dependencies
 

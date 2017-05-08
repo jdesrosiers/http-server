@@ -1,6 +1,7 @@
 package org.flint;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javaslang.collection.Queue;
 import javaslang.CheckedFunction1;
@@ -15,8 +16,15 @@ import org.flint.routing.RouteMatcher;
 import org.flint.routing.UriTemplate;
 
 public class Application {
-    private RouteMatcher routeMatcher = new RouteMatcher();
-    private RangeMiddleware rangeMiddleware = new RangeMiddleware();
+    private RouteMatcher routeMatcher;
+    private LoggerMiddleware loggerMiddleware;
+    private RangeMiddleware rangeMiddleware;
+
+    public Application(Logger logger) {
+        this.routeMatcher = new RouteMatcher();
+        this.loggerMiddleware = new LoggerMiddleware(logger);
+        this.rangeMiddleware = new RangeMiddleware();
+    }
 
     public Route match(String method, String uriTemplate, CheckedFunction1<Request, Response> controller) {
         Route route = new Route(method, new UriTemplate(uriTemplate), controller);
@@ -59,7 +67,7 @@ public class Application {
         Response response;
 
         try {
-            LoggerMiddleware.logRequest(request);
+            request = loggerMiddleware.logRequest(request);
             response = routeMatcher.applyController(request);
             response = rangeMiddleware.apply(request, response);
         } catch (HttpException he) {
