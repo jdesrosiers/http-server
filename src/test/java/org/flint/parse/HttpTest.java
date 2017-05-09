@@ -73,7 +73,8 @@ public class HttpTest {
     public static Object[][] dataProviderHeaders() {
         return new Object[][] {
             { "Content-Length: 12", Tuple.of("Content-Length", "12") },
-            { "Content-Type: text/plain; charset=utf-8", Tuple.of("Content-Type", "text/plain; charset=utf-8") }
+            { "Content-Type: text/plain; charset=utf-8", Tuple.of("Content-Type", "text/plain; charset=utf-8") },
+            { "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebkit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36", Tuple.of("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebkit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36") }
         };
     }
 
