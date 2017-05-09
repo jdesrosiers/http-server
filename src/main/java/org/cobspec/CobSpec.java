@@ -1,9 +1,7 @@
 package org.cobspec;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.Path;
 import java.util.logging.Logger;
 import java.util.logging.FileHandler;
 import java.util.logging.SimpleFormatter;
@@ -11,11 +9,8 @@ import java.util.logging.SimpleFormatter;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 
-import org.flint.exception.UnauthorizedHttpException;
-import org.flint.request.Request;
 import org.flint.Application;
 import org.flint.response.Response;
-import org.flint.response.StatusCode;
 
 import org.cobspec.controller.CoffeePotController;
 import org.cobspec.controller.CookieController;
@@ -78,12 +73,9 @@ class CobSpec {
 
         FileSystemController logsController = new FileSystemController(Paths.get("."));
         List<String> authorizedUsers = List.of("Basic YWRtaW46aHVudGVyMg==");
-        app.get("/logs", (request) -> {
-            String auth = request.getHeader("Authorization").getOrElse("");
-            if (!authorizedUsers.contains(auth)) {
-                throw new UnauthorizedHttpException("Basic realm=\"cobspec-logs\"");
-            }
-
+        AuthorizationMiddleware authenticationMiddleware = new AuthorizationMiddleware(authorizedUsers);
+        app.get("/logs", request -> {
+            request = authenticationMiddleware.auth(request);
             return logsController.get(request);
         });
 

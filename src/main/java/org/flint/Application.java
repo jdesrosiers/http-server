@@ -3,7 +3,6 @@ package org.flint;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javaslang.collection.Queue;
 import javaslang.CheckedFunction1;
 
 import org.flint.exception.HttpException;
