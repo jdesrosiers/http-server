@@ -21,21 +21,9 @@ import org.flint.response.StatusCode;
 
 public class ApplicationTest {
 
-    private Logger logger;
-
-    public ApplicationTest() {
-        this.logger = Logger.getAnonymousLogger();
-
-        // Suppress default console output
-        Logger rootLogger = Logger.getLogger("");
-        for (Handler handler : rootLogger.getHandlers()) {
-            rootLogger.removeHandler(handler);
-        }
-    }
-
     @Test
     public void itShouldHandleASimpleGET() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -54,7 +42,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldMatchRoutesWithoutQueryParams() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -73,7 +61,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimpleHEAD() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -92,7 +80,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimplePOST() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         app.post("/foo", (request) -> {
             Response response = Response.create();
@@ -111,7 +99,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimplePUT() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         app.put("/foo", (request) -> {
             Response response = Response.create();
@@ -130,7 +118,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimpleDELETE() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         app.delete("/foo", (request) -> {
             Response response = Response.create();
@@ -149,7 +137,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimpleOPTIONS() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         app.options("/foo", (request) -> {
             Response response = Response.create();
@@ -170,7 +158,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimplePATCH() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         app.patch("/foo", (request) -> {
             Response response = Response.create(StatusCode.NO_CONTENT);
@@ -190,7 +178,7 @@ public class ApplicationTest {
 
     @Test
     public void itShould404WhenANonexistentResourceIsRequested() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         Request request = new Request(Method.GET, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
@@ -201,7 +189,7 @@ public class ApplicationTest {
 
     @Test
     public void itShould404WhenANonexistentResourceIsHeadRequested() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         Request request = new Request(Method.HEAD, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
@@ -213,7 +201,7 @@ public class ApplicationTest {
 
     @Test
     public void itShould405WhenResourceExistsButMethodIsNotAllowed() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         app.post("/foo", (request) -> {
             Response response = Response.create();
@@ -232,7 +220,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHaveAnAllowHeaderWithAllAllowedMethodsWhenResponseIs405() {
-        Application app = new Application(logger);
+        Application app = new Application();
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -251,6 +239,47 @@ public class ApplicationTest {
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));
         assertThat(response.getHeader("Allow"), equalTo(Option.of(Method.GET + "," + Method.POST)));
         assertThat(response.getBodyAsString(), containsString("405 Method Not Allowed"));
+    }
+
+    @Test
+    public void itShouldCallBeforeMiddleware() {
+        Application app = new Application()
+            .before(request -> {
+                request.setHeader("Foo", "bar");
+                return request;
+            })
+            .before(request -> {
+                request.setHeader("Bar", "foo");
+                return request;
+            });
+
+        app.get("/foo", (request) -> Response.create());
+
+        Request request = new Request(Method.GET, new OriginForm("/foo"));
+        app.requestHandler(request);
+
+        assertThat(request.getHeader("Foo"), equalTo(Option.of("bar")));
+        assertThat(request.getHeader("Bar"), equalTo(Option.of("foo")));
+    }
+
+    @Test
+    public void itShouldCallAfterMiddleware() {
+        Application app = new Application()
+            .after((request, response) -> {
+                response.setHeader("Foo", "bar");
+                return response;
+            })
+            .after((request, response) -> {
+                response.setHeader("Bar", "foo");
+                return response;
+            });
+
+        app.get("/foo", (request) -> Response.create());
+
+        Request request = new Request(Method.GET, new OriginForm("/foo"));
+        Response response = app.requestHandler(request);
+
+        assertThat(response.getHeader("Bar"), equalTo(Option.of("foo")));
     }
 
 }

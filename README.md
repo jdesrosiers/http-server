@@ -85,11 +85,22 @@ app.post("/foo", myController::post);
 app.delete("/foo/bar", myController::delete);
 ```
 
-Route createion helper functions exist for the following HTTP methods: GET, POST, PUT, PATCH, DELETE, OPTIONS.  If you want to use another method you can use `Application::match` to specify your method.
+Route creation helper functions exist for the following HTTP methods: GET, POST, PUT, PATCH, DELETE, OPTIONS.  If you want to use another method you can use `Application::match` to specify your method.
 
 ```java
 app.match("FOO", "/hello", request -> /* ... */);
 ```
+
+## Application Middleware
+Middleware allows you to run some code before or after each request.  It allows you to alter the behavior of the server without having to add dependencies to the core Flint library.  For example, each application can choose how it wants to do logging rather than depending on the way the server chooses to do it.  Other useful things it could be used for are caching and partial content responses.  It's also useful for reducing duplication and general organization.
+
+```java
+Application app = new Application()
+    .before(loggerMiddleware::logRequest)
+    .after(RangeMiddleware::handleRange);
+```
+
+Before middleware functions take a Request and returns a Request.  After middleware functions take a Request and a Response and return a Response.
 
 ## Requests
 The `Request` class represents an HTTP request message.  It gives you access to the request's method, path, headers, and body.  Headers are always returned as `Option`s.

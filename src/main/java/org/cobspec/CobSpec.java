@@ -24,7 +24,9 @@ class CobSpec {
         int port = Integer.valueOf(arguments.get("p").getOrElse("5000"));
         String directory = arguments.get("d").getOrElse("public");
 
-        Application app = new Application(getLogger());
+        LoggerMiddleware loggerMiddleware = new LoggerMiddleware(getLogger());
+        Application app = new Application()
+            .before(loggerMiddleware::logRequest);
 
         FileSystemController fileSystemController = new FileSystemController(Paths.get(directory));
 
