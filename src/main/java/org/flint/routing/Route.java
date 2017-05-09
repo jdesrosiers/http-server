@@ -1,6 +1,9 @@
-package org.flint;
+package org.flint.routing;
 
 import javaslang.CheckedFunction1;
+
+import org.flint.request.Request;
+import org.flint.response.Response;
 
 public class Route {
     private String method;

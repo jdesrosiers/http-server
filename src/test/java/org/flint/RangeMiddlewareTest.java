@@ -1,4 +1,4 @@
-package org.flint.range;
+package org.flint;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -13,10 +13,11 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
 import javaslang.control.Option;
 
-import org.flint.OriginForm;
-import org.flint.Request;
-import org.flint.Response;
-import org.flint.StatusCode;
+import org.flint.request.OriginForm;
+import org.flint.request.Method;
+import org.flint.request.Request;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 
 @RunWith(DataProviderRunner.class)
 public class RangeMiddlewareTest {
@@ -34,7 +35,7 @@ public class RangeMiddlewareTest {
     public void itShouldDoNothingIfThereIsNoRangeHeader() {
         RangeMiddleware range = new RangeMiddleware();
 
-        Request request = new Request("GET", new OriginForm("foo"));
+        Request request = new Request(Method.GET, new OriginForm("foo"));
         Response result = range.apply(request, response);
 
         assertThat(result.getStatusCode(), equalTo(StatusCode.OK));
@@ -47,11 +48,11 @@ public class RangeMiddlewareTest {
     @DataProvider
     public static Object[][] dataProviderMethods() {
         return new Object[][] {
-            { "HEAD" },
-            { "POST" },
-            { "PUT" },
-            { "DELETE" },
-            { "OPTIONS" }
+            { Method.HEAD },
+            { Method.POST },
+            { Method.PUT },
+            { Method.DELETE },
+            { Method.OPTIONS }
         };
     }
 
@@ -86,7 +87,7 @@ public class RangeMiddlewareTest {
     public void itShouldIgnoreTheRangeHeaderIfTheStatusIsNotOK(Response response, int statusCode) {
         RangeMiddleware range = new RangeMiddleware();
 
-        Request request = new Request("GET", new OriginForm("foo"));
+        Request request = new Request(Method.GET, new OriginForm("foo"));
         request.setHeader("Range", "bytes=0-4");
         Response result = range.apply(request, response);
 
@@ -99,7 +100,7 @@ public class RangeMiddlewareTest {
     public void itShouldIgnoreARangeHeaderThatItDoesntUnderstand() {
         RangeMiddleware range = new RangeMiddleware();
 
-        Request request = new Request("GET", new OriginForm("foo"));
+        Request request = new Request(Method.GET, new OriginForm("foo"));
         request.setHeader("Range", "foo=0-4");
         Response result = range.apply(request, response);
 
@@ -114,7 +115,7 @@ public class RangeMiddlewareTest {
     public void itShouldIgnoreAnInvalidRange() {
         RangeMiddleware range = new RangeMiddleware();
 
-        Request request = new Request("GET", new OriginForm("foo"));
+        Request request = new Request(Method.GET, new OriginForm("foo"));
         request.setHeader("Range", "bytes=30-35");
         Response result = range.apply(request, response);
 
@@ -129,7 +130,7 @@ public class RangeMiddlewareTest {
     public void itShouldReturnAPartialContentResponseIfEverythingIsSatisfiable() {
         RangeMiddleware range = new RangeMiddleware();
 
-        Request request = new Request("GET", new OriginForm("foo"));
+        Request request = new Request(Method.GET, new OriginForm("foo"));
         request.setHeader("Range", "bytes=0-4");
         Response result = range.apply(request, response);
 

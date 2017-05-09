@@ -7,14 +7,35 @@ import static org.hamcrest.Matchers.greaterThan;
 
 import org.junit.Test;
 
+import java.util.logging.Logger;
+import java.util.logging.Handler;
+
 import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
+import org.flint.request.OriginForm;
+import org.flint.request.Method;
+import org.flint.request.Request;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
+
 public class ApplicationTest {
+
+    private Logger logger;
+
+    public ApplicationTest() {
+        this.logger = Logger.getAnonymousLogger();
+
+        // Suppress default console output
+        Logger rootLogger = Logger.getLogger("");
+        for (Handler handler : rootLogger.getHandlers()) {
+            rootLogger.removeHandler(handler);
+        }
+    }
 
     @Test
     public void itShouldHandleASimpleGET() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -23,7 +44,7 @@ public class ApplicationTest {
             return response;
         });
 
-        Request request = new Request("GET", new OriginForm("/foo"));
+        Request request = new Request(Method.GET, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -33,7 +54,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldMatchRoutesWithoutQueryParams() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -42,7 +63,7 @@ public class ApplicationTest {
             return response;
         });
 
-        Request request = new Request("GET", new OriginForm("/foo", "bar"));
+        Request request = new Request(Method.GET, new OriginForm("/foo", "bar"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -52,7 +73,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimpleHEAD() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -61,7 +82,7 @@ public class ApplicationTest {
             return response;
         });
 
-        Request request = new Request("HEAD", new OriginForm("/foo"));
+        Request request = new Request(Method.HEAD, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -71,7 +92,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimplePOST() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.post("/foo", (request) -> {
             Response response = Response.create();
@@ -80,7 +101,7 @@ public class ApplicationTest {
             return response;
         });
 
-        Request request = new Request("POST", new OriginForm("/foo"));
+        Request request = new Request(Method.POST, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -90,7 +111,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimplePUT() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.put("/foo", (request) -> {
             Response response = Response.create();
@@ -99,7 +120,7 @@ public class ApplicationTest {
             return response;
         });
 
-        Request request = new Request("PUT", new OriginForm("/foo"));
+        Request request = new Request(Method.PUT, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -109,7 +130,7 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimpleDELETE() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.delete("/foo", (request) -> {
             Response response = Response.create();
@@ -118,7 +139,7 @@ public class ApplicationTest {
             return response;
         });
 
-        Request request = new Request("DELETE", new OriginForm("/foo"));
+        Request request = new Request(Method.DELETE, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -128,28 +149,28 @@ public class ApplicationTest {
 
     @Test
     public void itShouldHandleASimpleOPTIONS() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.options("/foo", (request) -> {
             Response response = Response.create();
-            response.setHeader("Allow", "GET,POST");
+            response.setHeader("Allow", Method.GET + "," + Method.POST);
             response.setBody("foo");
 
             return response;
         });
 
-        Request request = new Request("OPTIONS", new OriginForm("/foo"));
+        Request request = new Request(Method.OPTIONS, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(response.getHeader("Allow"), equalTo(Option.of("GET,POST")));
+        assertThat(response.getHeader("Allow"), equalTo(Option.of(Method.GET + "," + Method.POST)));
         assertThat(response.getContentLength(), equalTo(3));
         assertThat(response.getBodyAsString(), equalTo("foo"));
     }
 
     @Test
     public void itShouldHandleASimplePATCH() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.patch("/foo", (request) -> {
             Response response = Response.create(StatusCode.NO_CONTENT);
@@ -158,7 +179,7 @@ public class ApplicationTest {
             return response;
         });
 
-        Request request = new Request("PATCH", new OriginForm("/foo"));
+        Request request = new Request(Method.PATCH, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NO_CONTENT));
@@ -169,9 +190,9 @@ public class ApplicationTest {
 
     @Test
     public void itShould404WhenANonexistentResourceIsRequested() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
-        Request request = new Request("GET", new OriginForm("/foo"));
+        Request request = new Request(Method.GET, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
@@ -180,9 +201,9 @@ public class ApplicationTest {
 
     @Test
     public void itShould404WhenANonexistentResourceIsHeadRequested() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
-        Request request = new Request("HEAD", new OriginForm("/foo"));
+        Request request = new Request(Method.HEAD, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.NOT_FOUND));
@@ -192,7 +213,7 @@ public class ApplicationTest {
 
     @Test
     public void itShould405WhenResourceExistsButMethodIsNotAllowed() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.post("/foo", (request) -> {
             Response response = Response.create();
@@ -201,17 +222,17 @@ public class ApplicationTest {
             return response;
         });
 
-        Request request = new Request("GET", new OriginForm("/foo"));
+        Request request = new Request(Method.GET, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));
-        assertThat(response.getHeader("Allow"), equalTo(Option.of("POST")));
+        assertThat(response.getHeader("Allow"), equalTo(Option.of(Method.POST)));
         assertThat(response.getBodyAsString(), containsString("405 Method Not Allowed"));
     }
 
     @Test
     public void itShouldHaveAnAllowHeaderWithAllAllowedMethodsWhenResponseIs405() {
-        Application app = new Application();
+        Application app = new Application(logger);
 
         app.get("/foo", (request) -> {
             Response response = Response.create();
@@ -224,11 +245,11 @@ public class ApplicationTest {
             return Response.create();
         });
 
-        Request request = new Request("DELETE", new OriginForm("/foo"));
+        Request request = new Request(Method.DELETE, new OriginForm("/foo"));
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));
-        assertThat(response.getHeader("Allow"), equalTo(Option.of("GET,POST")));
+        assertThat(response.getHeader("Allow"), equalTo(Option.of(Method.GET + "," + Method.POST)));
         assertThat(response.getBodyAsString(), containsString("405 Method Not Allowed"));
     }
 

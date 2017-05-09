@@ -19,10 +19,11 @@ import javaslang.control.Option;
 import org.flint.exception.NotFoundHttpException;
 import org.flint.exception.PreconditionFailedHttpException;
 import org.flint.exception.UnsupportedMediaTypeHttpException;
-import org.flint.OriginForm;
-import org.flint.Response;
-import org.flint.Request;
-import org.flint.StatusCode;
+import org.flint.request.Method;
+import org.flint.request.Request;
+import org.flint.request.OriginForm;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 import org.util.FileSystem;
 
 public class FileSystemControllerTest {
@@ -30,7 +31,7 @@ public class FileSystemControllerTest {
     @Test
     public void itShouldGetAFileFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
-        Request request = new Request("GET", new OriginForm("/file1"));
+        Request request = new Request(Method.GET, new OriginForm("/file1"));
         Response response = controller.get(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -41,14 +42,14 @@ public class FileSystemControllerTest {
     @Test(expected=NotFoundHttpException.class)
     public void itShould404WhenGettingANonexistentFileFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
-        Request request = new Request("GET", new OriginForm("/foobar"));
+        Request request = new Request(Method.GET, new OriginForm("/foobar"));
         Response response = controller.get(request);
     }
 
     @Test
     public void itShouldGetADirectoryListingFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
-        Request request = new Request("GET", new OriginForm("/"));
+        Request request = new Request(Method.GET, new OriginForm("/"));
         Response response = controller.index(request);
         String body = response.getBodyAsString();
 
@@ -63,7 +64,7 @@ public class FileSystemControllerTest {
         Files.copy(Paths.get("src/test/resources/file1"), Paths.get("src/test/resources/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
-        Request request = new Request("DELETE", new OriginForm("/foo"));
+        Request request = new Request(Method.DELETE, new OriginForm("/foo"));
         Response response = controller.delete(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -72,7 +73,7 @@ public class FileSystemControllerTest {
     @Test
     public void itShouldPutANewFileToTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
-        Request request = new Request("PUT", new OriginForm("/foo"));
+        Request request = new Request(Method.PUT, new OriginForm("/foo"));
         request.setBody("foo contents");
         Response response = controller.write(request);
 
@@ -85,7 +86,7 @@ public class FileSystemControllerTest {
         Files.copy(Paths.get("src/test/resources/file1"), Paths.get("src/test/resources/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
-        Request request = new Request("PUT", new OriginForm("/foo"));
+        Request request = new Request(Method.PUT, new OriginForm("/foo"));
         request.setBody("foo contents");
         Response response = controller.write(request);
 
@@ -98,7 +99,7 @@ public class FileSystemControllerTest {
         Files.copy(Paths.get("src/test/resources/patch-content.txt"), Paths.get("src/test/resources/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
-        Request request = new Request("PATCH", new OriginForm("/foo"));
+        Request request = new Request(Method.PATCH, new OriginForm("/foo"));
         request.setBody("foo contents");
         request.setHeader("Content-Type", "text/plain; charset=utf-8");
 
@@ -122,7 +123,7 @@ public class FileSystemControllerTest {
         patch.append("> foo content\n");
         patch.append("\\ No newline at end of file\n");
 
-        Request request = new Request("PATCH", new OriginForm("/foo"));
+        Request request = new Request(Method.PATCH, new OriginForm("/foo"));
         request.setHeader("Content-Type", "application/unix-diff");
         request.setBody(patch.toString());
         Response response = controller.patch(request);
@@ -144,7 +145,7 @@ public class FileSystemControllerTest {
         patch.append("> foo content\n");
         patch.append("\\ No newline at end of file\n");
 
-        Request request = new Request("PATCH", new OriginForm("/foo"));
+        Request request = new Request(Method.PATCH, new OriginForm("/foo"));
         request.setHeader("Content-Type", "application/unix-diff");
         request.setHeader("If-Match", "xxx");
         request.setBody(patch.toString());
@@ -165,7 +166,7 @@ public class FileSystemControllerTest {
         patch.append("> foo content\n");
         patch.append("\\ No newline at end of file\n");
 
-        Request request = new Request("PATCH", new OriginForm("/foo"));
+        Request request = new Request(Method.PATCH, new OriginForm("/foo"));
         request.setHeader("Content-Type", "application/unix-diff");
         request.setHeader("If-Match", "dc50a0d27dda2eee9f65644cd7e4c9cf11de8bec");
         request.setBody(patch.toString());

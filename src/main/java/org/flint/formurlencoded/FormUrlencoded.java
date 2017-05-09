@@ -1,4 +1,4 @@
-package org.flint;
+package org.flint.formurlencoded;
 
 import javaslang.Tuple2;
 import javaslang.collection.HashMap;

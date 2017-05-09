@@ -6,6 +6,13 @@ This project has two main parts.  The first is an HTTP Server micro-framework ca
 # Development
 All code is written in Java 8 and uses the Gradle build tool
 
+## Build
+You can assemble the server into a jar using the following command.  The result can be found at `build/libs/http-server-all.jar`
+
+```
+> ./gradlew shadowJar
+```
+
 ## Test
 Tests use JUnit with the [junit-dataprovider](https://github.com/TNG/junit-dataprovider) test runner.  Tests can be run through gradle.
 
@@ -22,17 +29,10 @@ You can run the server with gradle
 > ./gradlew run
 ```
 
-### Logs
-Logs are written to stdout.  Cob_spec expects to find logs in the /logs file.  You can have logs write to the log file from the command line.
+Or, run the assembled jar
 
 ```
-> ./gradlew run > public/logs
-```
-
-Or, if you want to see the logs *and* write them to file you can use `tee`.
-
-```
-> ./gradlew run | tee public/logs
+> java -jar build/libs/http-server-all.jar
 ```
 
 ### Arguments
@@ -44,7 +44,11 @@ The server takes two optional arguments `[-p PORT] [-d DIRECTORY]`.  Where `PORT
 
 ```
 > ./gradlew run -PappArgs="-p 5000 -d public"
+> java -jar build/libs/http-server-all.jar -p 5000 -d public"
 ```
+
+### Logs
+Logs are written to stdout and a file at `./logs`.
 
 ## Dependencies
 

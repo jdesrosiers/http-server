@@ -9,7 +9,7 @@ import org.junit.Test;
 import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
-import org.flint.StatusCode;
+import org.flint.response.StatusCode;
 
 public class HttpExceptionTest {
 

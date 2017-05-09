@@ -18,9 +18,9 @@ import static org.flint.parse.Abnf.VCHAR;
 import static org.flint.parse.Uri.SEGMENT;
 import static org.flint.parse.Uri.QUERY;
 
-import org.flint.OriginForm;
-import org.flint.Request;
-import org.flint.RequestTarget;
+import org.flint.request.OriginForm;
+import org.flint.request.Request;
+import org.flint.request.RequestTarget;
 
 public class Http {
     public static final Parser<String> TCHAR = Parsers.or(

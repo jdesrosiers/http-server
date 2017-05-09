@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import javaslang.control.Option;
 
-import org.flint.Response;
-import org.flint.StatusCode;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 
 public class SuffixByteRange extends SingleByteRange {
     private int length;

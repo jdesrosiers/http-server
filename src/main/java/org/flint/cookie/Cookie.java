@@ -1,4 +1,4 @@
-package org.flint;
+package org.flint.cookie;
 
 import javaslang.collection.HashMap;
 import javaslang.control.Option;

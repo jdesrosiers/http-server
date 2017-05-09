@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.util.logging.Logger;
+import java.util.logging.FileHandler;
+import java.util.logging.SimpleFormatter;
 
 import javaslang.collection.List;
 import javaslang.collection.Map;
 
 import org.flint.exception.UnauthorizedHttpException;
+import org.flint.request.Request;
 import org.flint.Application;
-import org.flint.Response;
-import org.flint.Request;
-import org.flint.StatusCode;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 
 import org.cobspec.controller.CoffeePotController;
 import org.cobspec.controller.CookieController;
@@ -25,7 +28,7 @@ class CobSpec {
         int port = Integer.valueOf(arguments.get("p").getOrElse("5000"));
         String directory = arguments.get("d").getOrElse("public");
 
-        Application app = new Application();
+        Application app = new Application(getLogger());
 
         FileSystemController fileSystemController = new FileSystemController(Paths.get(directory));
 
@@ -87,5 +90,15 @@ class CobSpec {
         app.get("/eat_cookie", cookieController::useCookie);
 
         app.run(port);
+    }
+
+    private static Logger getLogger() throws IOException {
+        FileHandler fileHandler = new FileHandler("logs");
+        fileHandler.setFormatter(new SimpleFormatter());
+
+        Logger logger = Logger.getAnonymousLogger();
+        logger.addHandler(fileHandler);
+
+        return logger;
     }
 }

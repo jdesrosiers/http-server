@@ -1,6 +1,6 @@
 package org.flint.exception;
 
-import org.flint.StatusCode;
+import org.flint.response.StatusCode;
 
 public class PreconditionFailedHttpException extends HttpException {
     public PreconditionFailedHttpException() {

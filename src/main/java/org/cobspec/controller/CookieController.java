@@ -1,10 +1,10 @@
 package org.cobspec.controller;
 
-import org.flint.Cookie;
-import org.flint.FormUrlencoded;
-import org.flint.Request;
-import org.flint.Response;
-import org.flint.StatusCode;
+import org.flint.cookie.Cookie;
+import org.flint.formurlencoded.FormUrlencoded;
+import org.flint.request.Request;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 
 public class CookieController {
     public Response writeCookie(Request request) {
