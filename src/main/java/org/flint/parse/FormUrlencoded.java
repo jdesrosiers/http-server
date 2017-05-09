@@ -11,6 +11,7 @@ import org.jparsec.Parsers;
 import org.jparsec.Scanners;
 
 import static org.flint.parse.Abnf.HEXDIG;
+import static org.flint.parse.Uri.DECODE;
 
 // https://tools.ietf.org/html/draft-hoehrmann-urlencoded-01
 public class FormUrlencoded {
@@ -29,7 +30,8 @@ public class FormUrlencoded {
             Scanners.isChar('%'),
             Scanners.isChar('+')
         ).many1()
-        .label("name").source();
+        .label("name").source()
+        .map(DECODE::parse);
 
     private static final Parser<String> VALUE = Parsers.or(
             VALUECHAR,
@@ -37,7 +39,8 @@ public class FormUrlencoded {
             Scanners.isChar('%'),
             Scanners.isChar('+')
         ).many()
-        .label("value").source();
+        .label("value").source()
+        .map(DECODE::parse);
 
     private static final Parser<Tuple2<String, String>> PAIR = Parsers.sequence(
             NAME,
