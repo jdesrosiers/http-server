@@ -39,8 +39,13 @@ class CobSpec {
         app.get("/image.jpeg", fileSystemController::get);
         app.get("/image.png", fileSystemController::get);
         app.get("/image.gif", fileSystemController::get);
-        app.get("/partial_content.txt", fileSystemController::get);
         app.get("/text-file.txt", fileSystemController::get);
+
+        RangeMiddleware rangeMiddleware = new RangeMiddleware();
+        app.get("/partial_content.txt", request -> {
+            Response response = fileSystemController.get(request);
+            return rangeMiddleware.handleRange(request, response);
+        });
 
         app.get("/patch-content.txt", fileSystemController::get);
         app.patch("/patch-content.txt", fileSystemController::patch);

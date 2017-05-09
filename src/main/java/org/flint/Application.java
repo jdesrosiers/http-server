@@ -18,12 +18,10 @@ import org.flint.routing.UriTemplate;
 public class Application {
     private RouteMatcher routeMatcher;
     private LoggerMiddleware loggerMiddleware;
-    private RangeMiddleware rangeMiddleware;
 
     public Application(Logger logger) {
         this.routeMatcher = new RouteMatcher();
         this.loggerMiddleware = new LoggerMiddleware(logger);
-        this.rangeMiddleware = new RangeMiddleware();
     }
 
     public Route match(String method, String uriTemplate, CheckedFunction1<Request, Response> controller) {
@@ -69,7 +67,6 @@ public class Application {
         try {
             request = loggerMiddleware.logRequest(request);
             response = routeMatcher.applyController(request);
-            response = rangeMiddleware.apply(request, response);
         } catch (HttpException he) {
             response = defaultResponse(he.getStatusCode());
             he.getHeaders().forEach(response::setHeader);

@@ -1,4 +1,4 @@
-package org.flint;
+package org.cobspec;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -36,7 +36,7 @@ public class RangeMiddlewareTest {
         RangeMiddleware range = new RangeMiddleware();
 
         Request request = new Request(Method.GET, new OriginForm("foo"));
-        Response result = range.apply(request, response);
+        Response result = range.handleRange(request, response);
 
         assertThat(result.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(result.getHeader("Content-Range"), equalTo(Option.none()));
@@ -63,7 +63,7 @@ public class RangeMiddlewareTest {
 
         Request request = new Request(method, new OriginForm("foo"));
         request.setHeader("Range", "bytes=0-4");
-        Response result = range.apply(request, response);
+        Response result = range.handleRange(request, response);
 
         assertThat(result.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(result.getHeader("Content-Range"), equalTo(Option.none()));
@@ -89,7 +89,7 @@ public class RangeMiddlewareTest {
 
         Request request = new Request(Method.GET, new OriginForm("foo"));
         request.setHeader("Range", "bytes=0-4");
-        Response result = range.apply(request, response);
+        Response result = range.handleRange(request, response);
 
         assertThat(result.getStatusCode(), equalTo(statusCode));
         assertThat(result.getHeader("Content-Range"), equalTo(Option.none()));
@@ -102,7 +102,7 @@ public class RangeMiddlewareTest {
 
         Request request = new Request(Method.GET, new OriginForm("foo"));
         request.setHeader("Range", "foo=0-4");
-        Response result = range.apply(request, response);
+        Response result = range.handleRange(request, response);
 
         assertThat(result.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(result.getHeader("Content-Range"), equalTo(Option.none()));
@@ -117,7 +117,7 @@ public class RangeMiddlewareTest {
 
         Request request = new Request(Method.GET, new OriginForm("foo"));
         request.setHeader("Range", "bytes=30-35");
-        Response result = range.apply(request, response);
+        Response result = range.handleRange(request, response);
 
         assertThat(result.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(result.getHeader("Content-Range"), equalTo(Option.none()));
@@ -132,7 +132,7 @@ public class RangeMiddlewareTest {
 
         Request request = new Request(Method.GET, new OriginForm("foo"));
         request.setHeader("Range", "bytes=0-4");
-        Response result = range.apply(request, response);
+        Response result = range.handleRange(request, response);
 
         assertThat(result.getStatusCode(), equalTo(StatusCode.PARTIAL_CONTENT));
         assertThat(result.getHeader("Content-Range"), equalTo(Option.of("bytes 0-4/26")));
