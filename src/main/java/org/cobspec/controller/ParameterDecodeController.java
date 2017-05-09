@@ -1,9 +1,9 @@
 package org.cobspec.controller;
 
-import org.flint.Request;
-import org.flint.Response;
-import org.flint.StatusCode;
-import org.flint.FormUrlencoded;
+import org.flint.formurlencoded.FormUrlencoded;
+import org.flint.request.Request;
+import org.flint.response.Response;
+import org.flint.response.StatusCode;
 
 public class ParameterDecodeController {
     public Response run(Request request) {

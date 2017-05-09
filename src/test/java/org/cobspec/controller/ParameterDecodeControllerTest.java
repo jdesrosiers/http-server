@@ -5,10 +5,10 @@ import static org.hamcrest.Matchers.containsString;
 
 import org.junit.Test;
 
-import org.flint.FormUrlencoded;
-import org.flint.OriginForm;
-import org.flint.Request;
-import org.flint.Response;
+import org.flint.formurlencoded.FormUrlencoded;
+import org.flint.request.OriginForm;
+import org.flint.request.Request;
+import org.flint.response.Response;
 
 public class ParameterDecodeControllerTest {
 
