@@ -32,7 +32,6 @@ public class Cookie {
     public String toString() {
         return cookie
             .map((entry) -> entry._1 + "=" + entry._2)
-            .intersperse("; ")
-            .reduce(String::concat);
+            .mkString("; ");
     }
 }

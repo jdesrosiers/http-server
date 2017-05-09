@@ -11,8 +11,7 @@ public class ParameterDecodeController {
             .getOrElse(new FormUrlencoded())
             .toList()
             .map(entry -> entry._1 + " = " + entry._2)
-            .intersperse("\n")
-            .fold("", String::concat);
+            .mkString("\n");
 
         Response response = Response.create(StatusCode.OK);
         response.setHeader("Content-Type", "text/plain; charset=utf-8");
