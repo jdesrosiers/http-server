@@ -6,6 +6,8 @@ import javaslang.CheckedFunction1;
 import javaslang.CheckedFunction2;
 
 import org.flint.exception.HttpException;
+import org.flint.middleware.AfterMiddleware;
+import org.flint.middleware.BeforeMiddleware;
 import org.flint.request.Method;
 import org.flint.request.Request;
 import org.flint.response.Response;
@@ -76,9 +78,9 @@ public class Application {
         Response response;
 
         try {
-            request = beforeMiddleware.applyMiddleware(request);
+            request = beforeMiddleware.applyAll(request);
             response = routeMatcher.applyController(request);
-            response = afterMiddleware.applyMiddleware(request, response);
+            response = afterMiddleware.applyAll(request, response);
         } catch (HttpException he) {
             response = defaultResponse(he.getStatusCode());
             he.getHeaders().forEach(response::setHeader);

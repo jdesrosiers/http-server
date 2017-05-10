@@ -16,7 +16,7 @@ public class RouteMatcher {
     }
 
     public Response applyController(Request request) throws Throwable {
-        return getMatchFor(request).getController().apply(request);
+        return getMatchFor(request).applyController(request);
     }
 
     public Route getMatchFor(Request request) {

@@ -39,10 +39,8 @@ class CobSpec {
         app.get("/text-file.txt", fileSystemController::get);
 
         RangeMiddleware rangeMiddleware = new RangeMiddleware();
-        app.get("/partial_content.txt", request -> {
-            Response response = fileSystemController.get(request);
-            return rangeMiddleware.handleRange(request, response);
-        });
+        app.get("/partial_content.txt", fileSystemController::get)
+            .after(rangeMiddleware::handleRange);
 
         app.get("/patch-content.txt", fileSystemController::get);
         app.patch("/patch-content.txt", fileSystemController::patch);
@@ -76,10 +74,8 @@ class CobSpec {
         FileSystemController logsController = new FileSystemController(Paths.get("."));
         List<String> authorizedUsers = List.of("Basic YWRtaW46aHVudGVyMg==");
         AuthorizationMiddleware authenticationMiddleware = new AuthorizationMiddleware(authorizedUsers);
-        app.get("/logs", request -> {
-            request = authenticationMiddleware.auth(request);
-            return logsController.get(request);
-        });
+        app.get("/logs", logsController::get)
+            .before(authenticationMiddleware::auth);
 
         CoffeePotController coffeePotController = new CoffeePotController();
         app.get("/tea", coffeePotController::tea);

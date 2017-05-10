@@ -102,6 +102,14 @@ Application app = new Application()
 
 Before middleware functions take a Request and returns a Request.  After middleware functions take a Request and a Response and return a Response.
 
+## Route Middleware
+Middleware can also be applied to Routes.
+
+```java
+app.get("/hello", request -> helloController::get)
+    .before(authorizationMiddleware::authorize);
+```
+
 ## Requests
 The `Request` class represents an HTTP request message.  It gives you access to the request's method, path, headers, and body.  Headers are always returned as `Option`s.
 
@@ -163,30 +171,21 @@ String fooCookie = cookie
 # Project Plan
 
 ## Current Sprint
-**From** 2017-05-01 **to** 2017-05-05
+**From** 2017-05-09 **to** 2017-05-10
 
 | AV  | IP  | CP  | SP  | Description |
 |:---:|:---:|:---:|:---:|-------------|
-|     |     |  X  |  3  | Fill out README file.  This should include documentation for developing, testing, and running the application.  It should document the Flint micro-framework.  It should include a project planning section to track progress and elicit feedback.
-|     |     |  X  |  1  | Rename the micro-framework from core to flint.
-|     |     |  X  |  1  | Rename HttpServer to CobSpec to clearly indicate that it is the implementation of cob_spec.
-|     |     |  X  |  2  | Move FileSystemControllerTest fixtures to test resources.  This should be trivial, but doing this in Java is always harder than it seems.
-|     |     |  X  |  1  | Move Response writing out of `Application`.  `Server` is probably the right place, but I haven't decided for sure.
-|     |     |  X  |  1  | Refactor parsers for consistent style.  As I worked on these, the style I chose to use has evolved.  I need to go back and make them consistent.
-|     |     |  X  |  1  | Convert StatusCode tests to parameterized tests
-|     |     |  X  |  1  | Audit the code for `*` imports and clean up where necessary.
-|     |     |  X  |  1  | Audit the code for unused imports and clean up where necessary.
-|     |     |  X  |  5  | Singe range partial content support.  It should ignore ranges it doesn't understand.  It should pass the ResponseTestSuite.PartialContent cob_spec test.
-|     |     |  X  |  2  | Decode URL encoded characters.  It should pass the ResponseTestSuite.ParameterDecode cob_spec test.
+|     |     |  X  |  3  | Add support for before and after middleware.  This enhances the flexibility of the micro-framework and can improve implementation of several features including logging and partial content.
+|     |     |  X  |  1  | Logging as middleware.  Currently logging is done automatically.  If it is done as middleware instead it gives the developer control over how he wants to do logging.
 
 **Legend:** *AV* => Available, *IP* => In Progress, *CP* => Completed, *SP* => Story Points
 
 ## Backlog
 | SP  | Description |
 |:---:|-------------|
-|  3  | Add support for before and after middleware.  This enhances the flexibility of the micro-framework and can improve implementation of several features including logging and partial content.
 |  3  | Add support for URI Templates.  This would allow routes like `app.get("/foo/{id}", request -> ...)`.  Currently routes can only do exact matches which limits how dynamic the server can be.
-|  1  | Logging as middleware.  Currently logging is done automatically.  If it is done a middleware instead it gives the developer control over how he wants to do logging.
 |  2  | Multiple byte range partial content support.  Once single byte range support is complete, this shouldn't be too difficult.
 |  2  | Decouple parser from flint and make it its own package.  If the dependency only goes one way, it could later be expanded into a general purpose tool for parsing anything HTTP related.  For example, an HTTP Client would require a parser that has a lot of overlap with the parsing needs for an HTTP Server.
+|  2  | Introduce a way to group routes so middleware can be applied to an arbitrary group rather than just one Route or all Routes.
+|  2  | Make default templates pluggable rather than hard-coded in Application
 

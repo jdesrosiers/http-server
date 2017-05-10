@@ -1,4 +1,4 @@
-package org.flint;
+package org.flint.middleware;
 
 import javaslang.CheckedFunction1;
 import javaslang.CheckedFunction2;
@@ -23,7 +23,7 @@ public class AfterMiddleware {
         return new AfterMiddleware(handlers.enqueue(handler));
     }
 
-    public Response applyMiddleware(Request request, Response response) throws Throwable {
+    public Response applyAll(Request request, Response response) throws Throwable {
         return handlers
             .map(handler -> Try.of(() -> handler.apply(request)).get())
             .fold(CheckedFunction1.identity(), (f, g) -> f.andThen(g))

@@ -7,10 +7,6 @@ import static org.hamcrest.Matchers.greaterThan;
 
 import org.junit.Test;
 
-import java.util.logging.Logger;
-import java.util.logging.Handler;
-
-import javaslang.collection.HashMap;
 import javaslang.control.Option;
 
 import org.flint.request.OriginForm;
@@ -239,47 +235,6 @@ public class ApplicationTest {
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));
         assertThat(response.getHeader("Allow"), equalTo(Option.of(Method.GET + "," + Method.POST)));
         assertThat(response.getBodyAsString(), containsString("405 Method Not Allowed"));
-    }
-
-    @Test
-    public void itShouldCallBeforeMiddleware() {
-        Application app = new Application()
-            .before(request -> {
-                request.setHeader("Foo", "bar");
-                return request;
-            })
-            .before(request -> {
-                request.setHeader("Bar", "foo");
-                return request;
-            });
-
-        app.get("/foo", (request) -> Response.create());
-
-        Request request = new Request(Method.GET, new OriginForm("/foo"));
-        app.requestHandler(request);
-
-        assertThat(request.getHeader("Foo"), equalTo(Option.of("bar")));
-        assertThat(request.getHeader("Bar"), equalTo(Option.of("foo")));
-    }
-
-    @Test
-    public void itShouldCallAfterMiddleware() {
-        Application app = new Application()
-            .after((request, response) -> {
-                response.setHeader("Foo", "bar");
-                return response;
-            })
-            .after((request, response) -> {
-                response.setHeader("Bar", "foo");
-                return response;
-            });
-
-        app.get("/foo", (request) -> Response.create());
-
-        Request request = new Request(Method.GET, new OriginForm("/foo"));
-        Response response = app.requestHandler(request);
-
-        assertThat(response.getHeader("Bar"), equalTo(Option.of("foo")));
     }
 
 }
