@@ -52,7 +52,6 @@ public class FormUrlencoded {
     public String toQueryString() {
         return values
             .map(this::entryToString)
-            .intersperse("&")
-            .fold("", String::concat);
+            .mkString("&");
     }
 }

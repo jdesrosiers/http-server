@@ -1,9 +1,7 @@
 package org.cobspec;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.Path;
 import java.util.logging.Logger;
 import java.util.logging.FileHandler;
 import java.util.logging.SimpleFormatter;
@@ -11,11 +9,8 @@ import java.util.logging.SimpleFormatter;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 
-import org.flint.exception.UnauthorizedHttpException;
-import org.flint.request.Request;
 import org.flint.Application;
 import org.flint.response.Response;
-import org.flint.response.StatusCode;
 
 import org.cobspec.controller.CoffeePotController;
 import org.cobspec.controller.CookieController;
@@ -29,7 +24,9 @@ class CobSpec {
         int port = Integer.valueOf(arguments.get("p").getOrElse("5000"));
         String directory = arguments.get("d").getOrElse("public");
 
-        Application app = new Application(getLogger());
+        LoggerMiddleware loggerMiddleware = new LoggerMiddleware(getLogger());
+        Application app = new Application()
+            .before(loggerMiddleware::logRequest);
 
         FileSystemController fileSystemController = new FileSystemController(Paths.get(directory));
 
@@ -39,8 +36,11 @@ class CobSpec {
         app.get("/image.jpeg", fileSystemController::get);
         app.get("/image.png", fileSystemController::get);
         app.get("/image.gif", fileSystemController::get);
-        app.get("/partial_content.txt", fileSystemController::get);
         app.get("/text-file.txt", fileSystemController::get);
+
+        RangeMiddleware rangeMiddleware = new RangeMiddleware();
+        app.get("/partial_content.txt", fileSystemController::get)
+            .after(rangeMiddleware::handleRange);
 
         app.get("/patch-content.txt", fileSystemController::get);
         app.patch("/patch-content.txt", fileSystemController::patch);
@@ -73,14 +73,9 @@ class CobSpec {
 
         FileSystemController logsController = new FileSystemController(Paths.get("."));
         List<String> authorizedUsers = List.of("Basic YWRtaW46aHVudGVyMg==");
-        app.get("/logs", (request) -> {
-            String auth = request.getHeader("Authorization").getOrElse("");
-            if (!authorizedUsers.contains(auth)) {
-                throw new UnauthorizedHttpException("Basic realm=\"cobspec-logs\"");
-            }
-
-            return logsController.get(request);
-        });
+        AuthorizationMiddleware authenticationMiddleware = new AuthorizationMiddleware(authorizedUsers);
+        app.get("/logs", logsController::get)
+            .before(authenticationMiddleware::auth);
 
         CoffeePotController coffeePotController = new CoffeePotController();
         app.get("/tea", coffeePotController::tea);

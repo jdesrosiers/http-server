@@ -1,8 +1,7 @@
-package org.flint;
+package org.cobspec;
 
 import java.io.IOException;
 
-import javaslang.CheckedFunction2;
 import javaslang.control.Option;
 import javaslang.control.Try;
 
@@ -14,8 +13,8 @@ import org.flint.request.Method;
 import org.flint.response.Response;
 import org.flint.response.StatusCode;
 
-public class RangeMiddleware implements CheckedFunction2<Request, Response, Response> {
-    public Response apply(Request request, Response response) {
+public class RangeMiddleware {
+    public Response handleRange(Request request, Response response) {
         return Option.of(request)
             .filter((r) -> r.getMethod().equals(Method.GET) && response.getStatusCode() == StatusCode.OK)
             .flatMap((r) -> r.getHeader("Range"))

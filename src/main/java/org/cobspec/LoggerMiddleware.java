@@ -1,4 +1,4 @@
-package org.flint;
+package org.cobspec;
 
 import java.util.logging.Logger;
 

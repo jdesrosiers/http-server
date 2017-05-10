@@ -1,12 +1,13 @@
 package org.flint;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
-import javaslang.collection.Queue;
 import javaslang.CheckedFunction1;
+import javaslang.CheckedFunction2;
 
 import org.flint.exception.HttpException;
+import org.flint.middleware.AfterMiddleware;
+import org.flint.middleware.BeforeMiddleware;
 import org.flint.request.Method;
 import org.flint.request.Request;
 import org.flint.response.Response;
@@ -17,13 +18,13 @@ import org.flint.routing.UriTemplate;
 
 public class Application {
     private RouteMatcher routeMatcher;
-    private LoggerMiddleware loggerMiddleware;
-    private RangeMiddleware rangeMiddleware;
+    private BeforeMiddleware beforeMiddleware;
+    private AfterMiddleware afterMiddleware;
 
-    public Application(Logger logger) {
+    public Application() {
         this.routeMatcher = new RouteMatcher();
-        this.loggerMiddleware = new LoggerMiddleware(logger);
-        this.rangeMiddleware = new RangeMiddleware();
+        this.beforeMiddleware = new BeforeMiddleware();
+        this.afterMiddleware = new AfterMiddleware();
     }
 
     public Route match(String method, String uriTemplate, CheckedFunction1<Request, Response> controller) {
@@ -57,6 +58,16 @@ public class Application {
         return match(Method.PATCH, uriTemplate, controller);
     }
 
+    public Application before(CheckedFunction1<Request, Request> handler) {
+        beforeMiddleware = beforeMiddleware.enqueue(handler);
+        return this;
+    }
+
+    public Application after(CheckedFunction2<Request, Response, Response> handler) {
+        afterMiddleware = afterMiddleware.enqueue(handler);
+        return this;
+    }
+
     public void run(int port) throws IOException {
         Server server = new Server(this::requestHandler);
 
@@ -67,9 +78,9 @@ public class Application {
         Response response;
 
         try {
-            request = loggerMiddleware.logRequest(request);
+            request = beforeMiddleware.applyAll(request);
             response = routeMatcher.applyController(request);
-            response = rangeMiddleware.apply(request, response);
+            response = afterMiddleware.applyAll(request, response);
         } catch (HttpException he) {
             response = defaultResponse(he.getStatusCode());
             he.getHeaders().forEach(response::setHeader);
