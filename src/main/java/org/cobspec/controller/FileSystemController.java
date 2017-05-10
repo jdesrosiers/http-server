@@ -24,8 +24,8 @@ import org.flint.exception.UnsupportedMediaTypeHttpException;
 import org.flint.request.Request;
 import org.flint.response.Response;
 import org.flint.response.StatusCode;
-import org.flint.unixpatch.UnixPatch;
 import org.flint.MediaType;
+import org.unixdiff.UnixPatch;
 import org.util.FileSystem;
 
 public class FileSystemController {

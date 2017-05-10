@@ -1,4 +1,4 @@
-package org.flint.unixpatch;
+package org.unixdiff;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

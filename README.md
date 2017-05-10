@@ -148,6 +148,7 @@ String fooCookie = cookie
 ```
 
 ## UnixPatch
+The PATCH method is intended to be used with a media type that describes the changes to be applied to the resource.  Such media types have been defined for JSON and XML, but none exist for text documents.  Since cob_spec does PATCH requests on text documents, I created a media type for the job and called it `application/unix-diff`.  It uses the unix diff format to describe changes and can be applied on the server using the unix patch command.
 
 # Project Plan
 
