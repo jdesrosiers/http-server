@@ -4,9 +4,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
 
+import org.junit.runner.RunWith;
 import org.junit.Test;
 import org.junit.After;
 import static org.junit.Assert.fail;
+import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.DataProviderRunner;
+import com.tngtech.java.junit.dataprovider.UseDataProvider;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +31,26 @@ import org.flint.response.Response;
 import org.flint.response.StatusCode;
 import org.util.FileSystem;
 
+@RunWith(DataProviderRunner.class)
 public class FileSystemControllerTest {
+
+    @DataProvider
+    public static Object[] dataProviderDirectories() {
+        return new Object[][] {
+            { "src/test/resources", "/foo", "src/test/resources/foo" },
+            { ".", "/foo", "foo" },
+            { ".", "/", "." }
+        };
+    }
+
+    @Test
+    @UseDataProvider("dataProviderDirectories")
+    public void itShouldCalculateTheTargetPath(String directory, String uri, String expected) {
+        FileSystemController controller = new FileSystemController(Paths.get(directory));
+        Request request = new Request(Method.GET, new OriginForm(uri));
+
+        assertThat(controller.getTargetPath(request).toString(), equalTo(expected));
+    }
 
     @Test
     public void itShouldGetAFileFromTheFileSystem() throws IOException {

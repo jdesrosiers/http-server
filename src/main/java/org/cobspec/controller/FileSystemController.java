@@ -138,7 +138,8 @@ public class FileSystemController {
     }
 
     public Path getTargetPath(Request request) {
-        return rootPath.resolve("." + request.getPath()).normalize();
+        Path path = rootPath.resolve("." + request.getPath()).normalize();
+        return path.toString().equals("") ? Paths.get(".") : path;
     }
 
     private Response _write(String target, InputStream body) throws IOException {
