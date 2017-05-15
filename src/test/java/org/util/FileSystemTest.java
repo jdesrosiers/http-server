@@ -16,22 +16,6 @@ import java.io.IOException;
 @RunWith(DataProviderRunner.class)
 public class FileSystemTest {
 
-    @DataProvider
-    public static Object[][] dataProviderExtensions() {
-        return new Object[][] {
-            { "a/b/c", "" },
-            { "foo.txt", "txt" },
-            { "a/b/c.jpg", "jpg" },
-            { "a/b.txt/c", "" }
-        };
-    }
-
-    @Test
-    @UseDataProvider("dataProviderExtensions")
-    public void itShouldGetTheExtensionFromAPath(String subject, String extension) {
-        assertThat(FileSystem.getExtension(subject), equalTo(extension));
-    }
-
     @Test
     public void itShouldCopyStreams() throws IOException {
         String subject = "Hello World\nFoo\nBar";
@@ -42,4 +26,5 @@ public class FileSystemTest {
 
         assertThat(out.toString(), equalTo(subject));
     }
+
 }

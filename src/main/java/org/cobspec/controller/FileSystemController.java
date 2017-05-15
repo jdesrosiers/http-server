@@ -36,6 +36,15 @@ public class FileSystemController {
 
     public Response get(Request request) throws IOException {
         Path targetPath = getTargetPath(request);
+        if (Files.isDirectory(targetPath)) {
+            return index(request);
+        } else {
+            return retrieve(request);
+        }
+    }
+
+    private Response retrieve(Request request) throws IOException {
+        Path targetPath = getTargetPath(request);
 
         ensureFileExists(targetPath);
 
@@ -48,7 +57,7 @@ public class FileSystemController {
         return response;
     }
 
-    public Response index(Request request) throws IOException {
+    private Response index(Request request) throws IOException {
         Path targetPath = getTargetPath(request);
 
         ensureFileExists(targetPath);

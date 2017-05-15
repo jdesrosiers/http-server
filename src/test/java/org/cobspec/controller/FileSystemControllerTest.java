@@ -50,7 +50,7 @@ public class FileSystemControllerTest {
     public void itShouldGetADirectoryListingFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
         Request request = new Request(Method.GET, new OriginForm("/"));
-        Response response = controller.index(request);
+        Response response = controller.get(request);
         String body = response.getBodyAsString();
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));

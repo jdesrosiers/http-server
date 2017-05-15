@@ -90,14 +90,7 @@ class CobSpec {
         ParameterDecodeController parameterDecodeController = new ParameterDecodeController();
         app.get("/parameters", parameterDecodeController::run);
 
-        app.get("*", request -> {
-            Path path = fileSystemController.getTargetPath(request);
-            if (Files.isDirectory(path)) {
-                return fileSystemController.index(request);
-            } else {
-                return fileSystemController.get(request);
-            }
-        });
+        app.get("*", fileSystemController::get);
 
         app.run(port);
     }
