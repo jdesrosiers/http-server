@@ -40,14 +40,6 @@ class CobSpec {
 
         FileSystemController fileSystemController = new FileSystemController(directory);
 
-        app.get("/", fileSystemController::index);
-        app.get("/file1", fileSystemController::get);
-        app.get("/file2", fileSystemController::get);
-        app.get("/image.jpeg", fileSystemController::get);
-        app.get("/image.png", fileSystemController::get);
-        app.get("/image.gif", fileSystemController::get);
-        app.get("/text-file.txt", fileSystemController::get);
-
         RangeMiddleware rangeMiddleware = new RangeMiddleware();
         app.get("/partial_content.txt", fileSystemController::get)
             .after(rangeMiddleware::handleRange);
@@ -97,6 +89,15 @@ class CobSpec {
 
         ParameterDecodeController parameterDecodeController = new ParameterDecodeController();
         app.get("/parameters", parameterDecodeController::run);
+
+        app.get("*", request -> {
+            Path path = fileSystemController.getTargetPath(request);
+            if (Files.isDirectory(path)) {
+                return fileSystemController.index(request);
+            } else {
+                return fileSystemController.get(request);
+            }
+        });
 
         app.run(port);
     }

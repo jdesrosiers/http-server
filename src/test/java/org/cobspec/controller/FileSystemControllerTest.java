@@ -35,7 +35,7 @@ public class FileSystemControllerTest {
         Response response = controller.get(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
-        assertThat(response.getHeader("Content-Type"), equalTo(Option.of("application/octet-stream")));
+        assertThat(response.getHeader("Content-Type"), equalTo(Option.of("text/plain")));
         assertThat(response.getBodyAsString(), equalTo("file1 contents"));
     }
 

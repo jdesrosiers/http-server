@@ -22,4 +22,10 @@ public class UriTemplateTest {
         assertThat(uriTemplate.getMatchFor("/bar"), equalTo(Option.none()));
     }
 
+    @Test
+    public void testWildcardMatch() {
+        UriTemplate uriTemplate = new UriTemplate("*");
+        assertThat(uriTemplate.getMatchFor("/bar"), equalTo(Option.of(HashMap.of())));
+    }
+
 }

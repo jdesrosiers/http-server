@@ -24,7 +24,6 @@ import org.flint.exception.UnsupportedMediaTypeHttpException;
 import org.flint.request.Request;
 import org.flint.response.Response;
 import org.flint.response.StatusCode;
-import org.flint.MediaType;
 import org.unixdiff.UnixPatch;
 import org.util.FileSystem;
 
@@ -41,8 +40,8 @@ public class FileSystemController {
         ensureFileExists(targetPath);
 
         Response response = Response.create();
-        String extension = FileSystem.getExtension(request.getPath());
-        String contentType = MediaType.fromExtension(extension).getOrElse("application/octet-stream");
+        String contentType = Option.of(Files.probeContentType(targetPath))
+            .getOrElse("application/octet-stream");
         response.setHeader("Content-Type", contentType);
         response.setBody(Files.newInputStream(targetPath));
 
@@ -54,7 +53,7 @@ public class FileSystemController {
 
         ensureFileExists(targetPath);
 
-        List<Link> links = List.ofAll(Files.walk(targetPath)
+        List<Link> links = List.ofAll(Files.walk(targetPath, 1)
             .filter(path -> Try.of(() -> !Files.isHidden(path) && !Files.isSameFile(path, targetPath)).get())
             .map((filePath) -> {
                 String href = rootPath.relativize(filePath).toString();
@@ -129,7 +128,7 @@ public class FileSystemController {
         return ifMatch.isDefined() && !ifMatch.get().toUpperCase().equals(eTag);
     }
 
-    private Path getTargetPath(Request request) {
+    public Path getTargetPath(Request request) {
         return rootPath.resolve("." + request.getPath()).normalize();
     }
 

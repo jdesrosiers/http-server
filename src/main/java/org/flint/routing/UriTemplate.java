@@ -12,7 +12,7 @@ public class UriTemplate {
     }
 
     public Option<Map<String, String>> getMatchFor(String uri) {
-        if (uri.equals(uriTemplate)) {
+        if (uriTemplate.equals("*") || uri.equals(uriTemplate)) {
             Map<String, String> matches = HashMap.of();
             return Option.of(matches);
         } else {
