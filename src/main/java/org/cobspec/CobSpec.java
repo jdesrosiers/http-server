@@ -1,6 +1,8 @@
 package org.cobspec;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 import java.util.logging.FileHandler;
@@ -22,13 +24,21 @@ class CobSpec {
     public static void main(String[] args) throws IOException {
         Map<String, String> arguments = Arguments.PARSER.parse(String.join(" ", args));
         int port = Integer.valueOf(arguments.get("p").getOrElse("5000"));
-        String directory = arguments.get("d").getOrElse("public");
+        Path directory = Paths.get(arguments.get("d").getOrElse("."));
+
+        if (!Files.exists(directory)) {
+            System.out.println("Directory '" + directory + "' does not exist.  Failed to start server.");
+            return;
+        } else if (!Files.isDirectory(directory)) {
+            System.out.println("Directory '" + directory + "' is not a directory.  Failed to start server.");
+            return;
+        }
 
         LoggerMiddleware loggerMiddleware = new LoggerMiddleware(getLogger());
         Application app = new Application()
             .before(loggerMiddleware::logRequest);
 
-        FileSystemController fileSystemController = new FileSystemController(Paths.get(directory));
+        FileSystemController fileSystemController = new FileSystemController(directory);
 
         app.get("/", fileSystemController::index);
         app.get("/file1", fileSystemController::get);
