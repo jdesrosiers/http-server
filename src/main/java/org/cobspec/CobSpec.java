@@ -10,6 +10,8 @@ import java.util.logging.SimpleFormatter;
 
 import javaslang.collection.List;
 import javaslang.collection.Map;
+import javaslang.control.Option;
+import javaslang.control.Try;
 
 import org.flint.Application;
 import org.flint.response.Response;
@@ -23,17 +25,29 @@ import org.cobspec.controller.RedirectController;
 class CobSpec {
     public static void main(String[] args) throws IOException {
         Map<String, String> arguments = Arguments.PARSER.parse(String.join(" ", args));
-        int port = Integer.valueOf(arguments.get("p").getOrElse("5000"));
-        Path directory = Paths.get(arguments.get("d").getOrElse("."));
+        Option<Integer> port = getPort(arguments);
+        Option<Path> directory = getDirectory(arguments);
 
-        if (!Files.exists(directory)) {
-            System.out.println("Directory '" + directory + "' does not exist.  Failed to start server.");
-            return;
-        } else if (!Files.isDirectory(directory)) {
-            System.out.println("Directory '" + directory + "' is not a directory.  Failed to start server.");
-            return;
+        if (directory.isEmpty()) {
+            System.out.println("Invalid value for -d option.  Failed to start server.");
+        } else if (port.isEmpty()) {
+            System.out.println("Invalid value for -p option.  Failed to start server.");
+        } else {
+            Application app = buildCobSpec(directory.get());
+            app.run(port.get());
         }
+    }
 
+    public static Option<Integer> getPort(Map<String, String> arguments) {
+        return Try.of(() -> Integer.valueOf(arguments.get("p").getOrElse("5000"))).toOption();
+    }
+
+    public static Option<Path> getDirectory(Map<String, String> arguments) {
+        Path directory = Paths.get(arguments.get("d").getOrElse("."));
+        return Files.exists(directory) && Files.isDirectory(directory) ? Option.of(directory) : Option.none();
+    }
+
+    public static Application buildCobSpec(Path directory) throws IOException {
         LoggerMiddleware loggerMiddleware = new LoggerMiddleware(getLogger());
         Application app = new Application()
             .before(loggerMiddleware::logRequest);
@@ -92,7 +106,7 @@ class CobSpec {
 
         app.get("*", fileSystemController::get);
 
-        app.run(port);
+        return app;
     }
 
     private static Logger getLogger() throws IOException {
