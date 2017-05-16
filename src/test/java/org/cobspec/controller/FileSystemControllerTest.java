@@ -55,7 +55,7 @@ public class FileSystemControllerTest {
     @Test
     public void itShouldGetAFileFromTheFileSystem() throws IOException {
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
-        Request request = new Request(Method.GET, new OriginForm("/file1"));
+        Request request = new Request(Method.GET, new OriginForm("/file1.txt"));
         Response response = controller.get(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
@@ -80,12 +80,12 @@ public class FileSystemControllerTest {
         assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
         assertThat(response.getHeader("Content-Type"), equalTo(Option.of("text/html; charset=utf-8")));
         assertThat(body, containsString("Index - /"));
-        assertThat(body, containsString("<a href=\"/file1\">file1</a>"));
+        assertThat(body, containsString("<a href=\"/file1.txt\">file1.txt</a>"));
     }
 
     @Test
     public void itShouldDeleteAFileFromTheFileSystem() throws IOException {
-        Files.copy(Paths.get("src/test/resources/file1"), Paths.get("src/test/resources/foo"));
+        Files.copy(Paths.get("src/test/resources/file1.txt"), Paths.get("src/test/resources/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
         Request request = new Request(Method.DELETE, new OriginForm("/foo"));
@@ -107,7 +107,7 @@ public class FileSystemControllerTest {
 
     @Test
     public void itShouldPutAnExistingFileToTheFileSystem() throws IOException {
-        Files.copy(Paths.get("src/test/resources/file1"), Paths.get("src/test/resources/foo"));
+        Files.copy(Paths.get("src/test/resources/file1.txt"), Paths.get("src/test/resources/foo"));
 
         FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
         Request request = new Request(Method.PUT, new OriginForm("/foo"));
