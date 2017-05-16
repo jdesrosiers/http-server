@@ -55,7 +55,10 @@ public class UnixPatch {
             status = process.exitValue();
             error = Files.exists(errPath) ? FileSystem.fileToString(errPath) : "";
 
-            Files.move(tempPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            if (status == 0) {
+                Files.move(tempPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+
             Files.deleteIfExists(tempPath);
             Files.deleteIfExists(errPath);
 
