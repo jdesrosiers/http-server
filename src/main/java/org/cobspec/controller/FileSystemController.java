@@ -24,6 +24,7 @@ import org.flint.exception.UnsupportedMediaTypeHttpException;
 import org.flint.request.Request;
 import org.flint.response.Response;
 import org.flint.response.StatusCode;
+import org.flint.MediaType;
 import org.unixdiff.UnixPatch;
 import org.util.FileSystem;
 
@@ -49,8 +50,7 @@ public class FileSystemController {
         ensureFileExists(targetPath);
 
         Response response = Response.create();
-        String contentType = Option.of(Files.probeContentType(targetPath))
-            .getOrElse("application/octet-stream");
+        String contentType = MediaType.fromPath(targetPath).getOrElse("application/octet-stream");
         response.setHeader("Content-Type", contentType);
         response.setBody(Files.newInputStream(targetPath));
 

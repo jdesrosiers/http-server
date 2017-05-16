@@ -138,6 +138,22 @@ The body can also be set as an `InputStream` to avoid reading large resources in
 response.setBody(Files.newInputStream(path);
 ```
 
+## MediaType
+The `MediaType` class contains a map of file extensions to media types.  You can retrieve these directly with `get`, or pass it a `Path` and have it determine the media type based on the file extension or by probing the file to guess the media type.
+
+```java
+MediaType.get("txt"); // Some("text/plain")
+
+// Determine media type by file extension
+MediaType.fromExtension(Paths.get("./foo.txt"));
+
+// Determine media type by it's content
+MediaType.fromContentProbe("./foo");
+
+// First check content, then extension
+MediaType.fromPath("./foo.json");
+```
+
 ## FormUrlencoded
 The `FormUrlencoded` class allows you read, manipulate, and write content in the `application/x-www-form-urlencoded` format.  This is the format HTML Forms use by default and the format normally used for query params.
 

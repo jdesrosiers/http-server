@@ -11,6 +11,12 @@ import javax.xml.bind.DatatypeConverter;
 import javaslang.control.Try;
 
 public class FileSystem {
+    public static String getExtension(String path) {
+        int extIndex = path.lastIndexOf(".");
+        int sepIndex = path.lastIndexOf("/");
+        return extIndex > 0 && sepIndex < extIndex ? path.substring(extIndex + 1) : "";
+    }
+
     public static void copyStreams(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[4096];
         int size = in.read(buffer);
