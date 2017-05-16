@@ -44,9 +44,9 @@ public class CobSpecTest {
     @Test
     public void itShouldUseTheDirectoryInTheDOption() {
         HashMap<String, String> arguments = HashMap.ofEntries(
-            Tuple.of("d", "public")
+            Tuple.of("d", "src/test/resources")
         );
-        assertThat(CobSpec.getDirectory(arguments), equalTo(Option.of(Paths.get("public"))));
+        assertThat(CobSpec.getDirectory(arguments), equalTo(Option.of(Paths.get("src/test/resources"))));
     }
 
     @Test
