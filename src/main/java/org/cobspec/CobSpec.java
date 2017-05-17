@@ -33,7 +33,7 @@ class CobSpec {
         } else if (port.isEmpty()) {
             System.out.println("Invalid value for -p option.  Failed to start server.");
         } else {
-            Application app = buildCobSpec(directory.get());
+            Application app = buildCobSpec(directory.get().toAbsolutePath().normalize());
             app.run(port.get());
         }
     }
