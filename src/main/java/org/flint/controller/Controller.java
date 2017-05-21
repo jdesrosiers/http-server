@@ -56,12 +56,12 @@ public class Controller {
     }
 
     public Response put(Request request) throws DataStoreException {
-        return write(request, request.getPath());
+        return write(request, request.getPath(), request.getBody());
     }
 
-    public Response write(Request request, String identifier) throws DataStoreException {
+    public Response write(Request request, String identifier, String body) throws DataStoreException {
         int statusCode = dataStore.contains(identifier) ? StatusCode.OK : StatusCode.CREATED;
-        dataStore.save(identifier, request.getBody());
+        dataStore.save(identifier, body);
 
         Response response = Response.create(statusCode);
         if (!request.getPath().equals(identifier)) {

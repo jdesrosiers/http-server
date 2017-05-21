@@ -63,7 +63,7 @@ class CobSpec {
         app.get("/patch-content.txt", fileSystemController::get);
         app.patch("/patch-content.txt", fileSystemController::patch);
 
-        app.post("/form", (request) -> fileSystemController.write(request, "/form/feline"));
+        app.post("/form", (request) -> fileSystemController.write(request, "/form/feline", request.getBody()));
         app.get("/form/feline", fileSystemController::get);
         app.put("/form/feline", fileSystemController::put);
         app.delete("/form/feline", fileSystemController::delete);

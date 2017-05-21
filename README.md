@@ -4,47 +4,47 @@
 This project has two main parts.  The first is an HTTP Server micro-framework called Flint.  The second is a server implementation using Flint that implements the [cob_spec](https://github.com/jdesrosiers/cob_spec) specification.
 
 # Development
-All code is written in Java 8 and uses the Gradle build tool
+All code is written in Java 8 and uses the Activator build tool
 
 ## Build
-You can assemble the server into a jar using the following command.  The result can be found at `build/libs/http-server-all.jar`
+You can assemble the server into a jar using the following command.  The result can be found at `target/scala-2.11/http-server-assembly-1.0.jar`
 
 ```
-> ./gradlew shadowJar
+> bin/activator assembly
 ```
 
 ## Test
-Tests use JUnit with the [junit-dataprovider](https://github.com/TNG/junit-dataprovider) test runner.  Tests can be run through gradle.
+Tests use JUnit with the [junit-dataprovider](https://github.com/TNG/junit-dataprovider) test runner.  Tests can be run through activator.
 
 ```
-> ./gradlew test
+> bin/activator test
 ```
 
 The cob_spec part of this project has [FitNesse tests](https://github.com/jdesrosiers/cob_spec).  You can refer to that project to see how to run those tests.
 
 ## Run
-You can run the server with gradle
+You can run the server with activator
 
 ```
-> ./gradlew run
+> bin/activator run
 ```
 
 Or, run the assembled jar
 
 ```
-> java -jar build/libs/http-server-all.jar
+> java -jar target/scala-2.11/http-server-assembly.jar
 ```
 
 ### Arguments
-The server takes two optional arguments `[-p PORT] [-d DIRECTORY]`.  Where `PORT` is the port the server will listen on and `DIRECTORY` is where many of the resources expected in cob_spec will be served from.  You can pass these arguments to the gradle `run` command with the `appArgs` argument.
+The server takes two optional arguments `[-p PORT] [-d DIRECTORY]`.  Where `PORT` is the port the server will listen on and `DIRECTORY` is where many of the resources expected in cob_spec will be served from.
 
 **Defaults:**
 * PORT: 5000
 * DIRECTORY: public
 
 ```
-> ./gradlew run -PappArgs="-p 5000 -d public"
-> java -jar build/libs/http-server-all.jar -p 5000 -d public"
+> bin/activator "run -p 5000 -d public"
+> java -jar target/scala-2.11/http-server-assembly.jar -p 5000 -d public"
 ```
 
 ### Logs
