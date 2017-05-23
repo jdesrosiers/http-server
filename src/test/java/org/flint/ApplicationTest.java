@@ -233,7 +233,7 @@ public class ApplicationTest {
         Response response = app.requestHandler(request);
 
         assertThat(response.getStatusCode(), equalTo(StatusCode.METHOD_NOT_ALLOWED));
-        assertThat(response.getHeader("Allow"), equalTo(Option.of(Method.GET + "," + Method.POST)));
+        assertThat(response.getHeader("Allow"), equalTo(Option.of(Method.GET + "," + Method.HEAD + "," + Method.POST)));
         assertThat(response.getBodyAsString(), containsString("405 Method Not Allowed"));
     }
 

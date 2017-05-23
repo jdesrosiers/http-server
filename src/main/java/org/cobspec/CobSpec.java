@@ -19,6 +19,7 @@ import org.flint.response.Response;
 import org.cobspec.controller.CoffeePotController;
 import org.cobspec.controller.CookieController;
 import org.cobspec.controller.FileSystemController;
+import org.cobspec.controller.OptionsController;
 import org.cobspec.controller.ParameterDecodeController;
 import org.cobspec.controller.RedirectController;
 
@@ -74,18 +75,7 @@ class CobSpec {
         app.get("/method_options", (request) -> Response.create());
         app.post("/method_options", (request) -> Response.create());
         app.put("/method_options", (request) -> Response.create());
-        app.options("/method_options", (request) -> {
-            Response response = Response.create();
-            response.setHeader("Allow", "GET,HEAD,POST,OPTIONS,PUT");
-            return response;
-        });
-
         app.get("/method_options2", (request) -> Response.create());
-        app.options("/method_options2", (request) -> {
-            Response response = Response.create();
-            response.setHeader("Allow", "GET,OPTIONS");
-            return response;
-        });
 
         FileSystemController logsController = new FileSystemController(Paths.get("."));
         List<String> authorizedUsers = List.of("Basic YWRtaW46aHVudGVyMg==");
@@ -105,6 +95,8 @@ class CobSpec {
         app.get("/parameters", parameterDecodeController::run);
 
         app.get("*", fileSystemController::get);
+        OptionsController optionsController = new OptionsController(app.getRouteMatcher());
+        app.options("*", optionsController::options);
 
         return app;
     }

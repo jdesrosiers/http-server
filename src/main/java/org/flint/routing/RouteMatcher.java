@@ -35,8 +35,8 @@ public class RouteMatcher {
 
     private String buildAllowHeader(Queue<Route> matches) {
         return matches
-            .map(Route::getMethod)
-            .reduce((a, b) -> a + "," + b);
+            .map(route -> route.getMethod() == Method.GET ? "GET,HEAD" : route.getMethod())
+            .mkString(",");
     }
 
     private boolean isUriMatch(Route route, Request request) {

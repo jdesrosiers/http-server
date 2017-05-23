@@ -95,6 +95,10 @@ public class Application {
         return response;
     }
 
+    public RouteMatcher getRouteMatcher() {
+        return routeMatcher;
+    }
+
     private Response defaultResponse(int statusCode) {
         Response response = Response.create(statusCode);
         response.setHeader("Content-Type", "text/html; charset=utf-8");
