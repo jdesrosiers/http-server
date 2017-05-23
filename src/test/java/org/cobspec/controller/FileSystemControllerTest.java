@@ -84,6 +84,18 @@ public class FileSystemControllerTest {
     }
 
     @Test
+    public void itShouldUseACustomIndexIfItExists() throws IOException {
+        FileSystemController controller = new FileSystemController(Paths.get("src/test/resources"));
+        Request request = new Request(Method.GET, new OriginForm("/custom"));
+        Response response = controller.get(request);
+        String body = response.getBodyAsString();
+
+        assertThat(response.getStatusCode(), equalTo(StatusCode.OK));
+        assertThat(response.getHeader("Content-Type"), equalTo(Option.of("text/html")));
+        assertThat(body, containsString("Custom Index"));
+    }
+
+    @Test
     public void itShouldDeleteAFileFromTheFileSystem() throws IOException {
         Files.copy(Paths.get("src/test/resources/file1.txt"), Paths.get("src/test/resources/foo"));
 

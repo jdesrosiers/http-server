@@ -38,15 +38,18 @@ public class FileSystemController {
     public Response get(Request request) throws IOException {
         Path targetPath = getTargetPath(request);
         if (Files.isDirectory(targetPath)) {
-            return index(request);
+            Path customIndexPath = targetPath.resolve("index");
+            if (Files.exists(customIndexPath)) {
+                return retrieve(customIndexPath);
+            } else {
+                return index(targetPath);
+            }
         } else {
-            return retrieve(request);
+            return retrieve(targetPath);
         }
     }
 
-    private Response retrieve(Request request) throws IOException {
-        Path targetPath = getTargetPath(request);
-
+    private Response retrieve(Path targetPath) throws IOException {
         ensureFileExists(targetPath);
 
         Response response = Response.create();
@@ -57,9 +60,7 @@ public class FileSystemController {
         return response;
     }
 
-    private Response index(Request request) throws IOException {
-        Path targetPath = getTargetPath(request);
-
+    private Response index(Path targetPath) throws IOException {
         ensureFileExists(targetPath);
 
         List<Link> links = List.ofAll(Files.walk(targetPath, 1)
@@ -70,7 +71,7 @@ public class FileSystemController {
                 return new Link(href, display);
             })
             .collect(Collectors.toList()));
-        Index index = new Index(request.getPath(), links);
+        Index index = new Index("/" + rootPath.relativize(targetPath).toString(), links);
 
         Response response = Response.create();
         response.setHeader("Content-Type", "text/html; charset=utf-8");
