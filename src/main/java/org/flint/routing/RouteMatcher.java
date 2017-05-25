@@ -36,6 +36,7 @@ public class RouteMatcher {
     private String buildAllowHeader(Queue<Route> matches) {
         return matches
             .map(route -> route.getMethod() == Method.GET ? "GET,HEAD" : route.getMethod())
+            .distinct()
             .mkString(",");
     }
 
