@@ -85,17 +85,23 @@ public class FileSystemController {
         return Response.create();
     }
 
-    public Response write(Request request) throws IOException {
-        ByteArrayInputStream body = new ByteArrayInputStream(request.getBody().getBytes());
-        return _write(request.getPath(), body);
+    public Response write(Request request, String body) throws IOException {
+        return _write(Paths.get(request.getPath()), body);
     }
 
-    public Response write(Request request, String location) throws IOException {
-        ByteArrayInputStream body = new ByteArrayInputStream(request.getBody().getBytes());
+    public Response write(Request request) throws IOException {
+        return write(request, request.getBody());
+    }
+
+    public Response write(Request request, Path location, String body) throws IOException {
         Response response = _write(location, body);
-        response.setHeader("Location", location);
+        response.setHeader("Location", location.toString());
 
         return response;
+    }
+
+    public Response write(Request request, Path location) throws IOException {
+        return write(request, location, request.getBody());
     }
 
     public Response patch(Request request) throws IOException, InterruptedException {
@@ -143,7 +149,7 @@ public class FileSystemController {
         return path.toString().equals("") ? Paths.get(".") : path;
     }
 
-    private Response _write(String target, InputStream body) throws IOException {
+    private Response _write(Path target, InputStream body) throws IOException {
         Path targetPath = rootPath.resolve("." + target).normalize();
 
         if (Files.exists(targetPath)) {
@@ -154,5 +160,9 @@ public class FileSystemController {
             Files.copy(body, targetPath);
             return Response.create(StatusCode.CREATED);
         }
+    }
+
+    private Response _write(Path target, String body) throws IOException {
+        return _write(target, new ByteArrayInputStream(body.getBytes()));
     }
 }
