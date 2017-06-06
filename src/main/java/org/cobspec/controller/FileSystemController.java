@@ -14,6 +14,8 @@ import javaslang.control.Option;
 import javaslang.control.Try;
 import javaslang.collection.List;
 
+import org.apache.tika.Tika;
+
 import org.cobspec.html.Index;
 import org.cobspec.html.Link;
 import org.cobspec.template.IndexTemplate;
@@ -24,11 +26,12 @@ import org.flint.exception.UnsupportedMediaTypeHttpException;
 import org.flint.request.Request;
 import org.flint.response.Response;
 import org.flint.response.StatusCode;
-import org.flint.MediaType;
 import org.unixdiff.UnixPatch;
 import org.util.FileSystem;
 
 public class FileSystemController {
+    private static final Tika contentType = new Tika();
+
     private Path rootPath;
 
     public FileSystemController(Path rootPath) {
@@ -53,8 +56,7 @@ public class FileSystemController {
         ensureFileExists(targetPath);
 
         Response response = Response.create();
-        String contentType = MediaType.fromPath(targetPath).getOrElse("application/octet-stream");
-        response.setHeader("Content-Type", contentType);
+        response.setHeader("Content-Type", contentType.detect(targetPath));
         response.setBody(Files.newInputStream(targetPath));
 
         return response;
