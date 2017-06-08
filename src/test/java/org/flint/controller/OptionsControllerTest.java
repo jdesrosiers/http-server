@@ -1,4 +1,4 @@
-package org.cobspec.controller;
+package org.flint.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

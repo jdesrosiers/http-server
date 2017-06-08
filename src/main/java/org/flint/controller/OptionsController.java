@@ -1,4 +1,4 @@
-package org.cobspec.controller;
+package org.flint.controller;
 
 import javaslang.collection.List;
 

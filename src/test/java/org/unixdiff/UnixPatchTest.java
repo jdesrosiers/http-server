@@ -2,23 +2,17 @@ package org.unixdiff;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-
 import org.junit.Test;
-import org.junit.After;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import org.util.FileSystem;
 
 public class UnixPatchTest {
 
     @Test
     public void isShouldApplyAPatch() throws InterruptedException, IOException {
-        Path targetPath = Paths.get("src/test/resources/foo.txt");
-        Files.copy(Paths.get("src/test/resources/patch-content.txt"), targetPath);
+        InputStream subject = new ByteArrayInputStream("default content".getBytes());
 
         StringBuilder patch = new StringBuilder();
         patch.append("1c1\n");
@@ -28,15 +22,9 @@ public class UnixPatchTest {
         patch.append("> foo content\n");
         patch.append("\\ No newline at end of file\n");
 
-        UnixPatch patcher = UnixPatch.patch(targetPath, patch.toString());
-        assertThat(patcher.getStatus(), equalTo(0));
-        assertThat(FileSystem.fileToString(targetPath), equalTo("foo content"));
-    }
+        UnixPatch patcher = UnixPatch.patch(subject, patch.toString());
 
-    @After
-    public void tearDown() throws IOException {
-        Files.deleteIfExists(Paths.get("src/test/resources/foo.txt.tmp.rej"));
-        Files.deleteIfExists(Paths.get("src/test/resources/foo.txt.tmp"));
-        Files.deleteIfExists(Paths.get("src/test/resources/foo.txt"));
+        assertThat(patcher.getStatus(), equalTo(0));
+        assertThat(patcher.getPatchedContent(), equalTo("foo content"));
     }
 }

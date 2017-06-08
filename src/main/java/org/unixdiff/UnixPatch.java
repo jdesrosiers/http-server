@@ -14,22 +14,22 @@ import org.util.FileSystem;
 public class UnixPatch {
     private Process process;
     private Path targetPath;
-    private Path tempPath;
     private Path errPath;
     private boolean complete = false;
     private int status;
     private String error;
+    private String patched;
 
     private UnixPatch() {}
 
-    public static UnixPatch patch(Path targetPath, String diff) throws InterruptedException, IOException {
+    public static UnixPatch patch(InputStream is, String diff) throws InterruptedException, IOException {
         UnixPatch patch = new UnixPatch();
-        patch.targetPath = targetPath;
+        patch.targetPath = Files.createTempFile(null, null);
+        patch.errPath = Files.createTempFile(null, null);
 
-        patch.tempPath = Paths.get(targetPath.toString() + ".tmp");
-        patch.errPath = Paths.get(targetPath.toString() + ".tmp.rej");
+        Files.copy(is, patch.targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-        String command = String.format("patch %s -o %s", targetPath, patch.tempPath);
+        String command = String.format("patch %s -r %s", patch.targetPath, patch.errPath);
         patch.process = Runtime.getRuntime().exec(command);
 
         OutputStream stdIn = patch.process.getOutputStream();
@@ -49,6 +49,11 @@ public class UnixPatch {
         return error;
     }
 
+    public String getPatchedContent() throws InterruptedException, IOException {
+        waitAndClean();
+        return patched;
+    }
+
     private void waitAndClean() throws InterruptedException, IOException {
         if (!complete) {
             process.waitFor(1L, TimeUnit.SECONDS);
@@ -56,10 +61,10 @@ public class UnixPatch {
             error = Files.exists(errPath) ? FileSystem.fileToString(errPath) : "";
 
             if (status == 0) {
-                Files.move(tempPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                patched = FileSystem.fileToString(targetPath);
             }
 
-            Files.deleteIfExists(tempPath);
+            Files.deleteIfExists(targetPath);
             Files.deleteIfExists(errPath);
 
             complete = true;

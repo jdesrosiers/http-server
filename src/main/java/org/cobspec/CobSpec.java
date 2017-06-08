@@ -19,9 +19,10 @@ import org.flint.response.Response;
 import org.cobspec.controller.CoffeePotController;
 import org.cobspec.controller.CookieController;
 import org.cobspec.controller.FileSystemController;
-import org.cobspec.controller.OptionsController;
+import org.cobspec.controller.LogController;
 import org.cobspec.controller.ParameterDecodeController;
 import org.cobspec.controller.RedirectController;
+import org.flint.controller.OptionsController;
 
 class CobSpec {
     public static void main(String[] args) throws IOException {
@@ -64,7 +65,7 @@ class CobSpec {
 
         app.post("/form", (request) -> fileSystemController.write(request, "/form/feline"));
         app.get("/form/feline", fileSystemController::get);
-        app.put("/form/feline", fileSystemController::write);
+        app.put("/form/feline", fileSystemController::put);
         app.delete("/form/feline", fileSystemController::delete);
 
         app.post("/noop-form", (request) -> Response.create());
@@ -77,7 +78,7 @@ class CobSpec {
         app.put("/method_options", (request) -> Response.create());
         app.get("/method_options2", (request) -> Response.create());
 
-        FileSystemController logsController = new FileSystemController(Paths.get("."));
+        LogController logsController = new LogController(Paths.get("."));
         List<String> authorizedUsers = List.of("Basic YWRtaW46aHVudGVyMg==");
         AuthorizationMiddleware authenticationMiddleware = new AuthorizationMiddleware(authorizedUsers);
         app.get("/logs", logsController::get)

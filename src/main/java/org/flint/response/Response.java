@@ -54,12 +54,7 @@ public class Response {
     }
 
     public String getBodyAsString() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        return Try.of(() -> {
-            FileSystem.copyStreams(body, out);
-            return out.toString();
-        }).getOrElse("");
+        return Try.of(() -> FileSystem.inputStreamToString(body)).getOrElse("");
     }
 
     public InputStream getBody() {

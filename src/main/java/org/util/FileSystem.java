@@ -1,22 +1,13 @@
 package org.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import javax.xml.bind.DatatypeConverter;
-
-import javaslang.control.Try;
 
 public class FileSystem {
-    public static String getExtension(String path) {
-        int extIndex = path.lastIndexOf(".");
-        int sepIndex = path.lastIndexOf("/");
-        return extIndex > 0 && sepIndex < extIndex ? path.substring(extIndex + 1) : "";
-    }
-
     public static void copyStreams(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[4096];
         int size = in.read(buffer);
@@ -31,11 +22,9 @@ public class FileSystem {
         return new String(bytes);
     }
 
-    public static String eTagFor(Path path) {
-        return Try.of(() -> {
-            byte[] contents = Files.readAllBytes(path);
-            byte[] hash = MessageDigest.getInstance("SHA1").digest(contents);
-            return DatatypeConverter.printHexBinary(hash);
-        }).get();
+    public static String inputStreamToString(InputStream is) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        copyStreams(is, os);
+        return os.toString();
     }
 }
