@@ -165,12 +165,10 @@ The PATCH method is intended to be used with a media type that describes the cha
 # Project Plan
 
 ## Current Sprint
-**From** 2017-05-09 **to** 2017-05-10
+**From** ??? **to** ???
 
 | AV  | IP  | CP  | SP  | Description |
 |:---:|:---:|:---:|:---:|-------------|
-|     |     |  X  |  3  | Add support for before and after middleware.  This enhances the flexibility of the micro-framework and can improve implementation of several features including logging and partial content.
-|     |     |  X  |  1  | Logging as middleware.  Currently logging is done automatically.  If it is done as middleware instead it gives the developer control over how he wants to do logging.
 
 **Legend:** *AV* => Available, *IP* => In Progress, *CP* => Completed, *SP* => Story Points
 
